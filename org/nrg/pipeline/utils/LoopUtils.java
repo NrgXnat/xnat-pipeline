@@ -52,6 +52,7 @@ public class LoopUtils {
                         if (loopValues != null && loopValues.size() > 0) {
                             for (int j = 0; j < loopValues.size(); j++) {
                                 aLoop.addValue((String)loopValues.get(j));
+                               // System.out.println("Loop values for " + xPathExpression + " " + loopValues.get(j));
                             }     
                         }
                         aLoop.unsetXpath();

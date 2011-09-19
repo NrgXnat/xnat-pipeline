@@ -114,6 +114,8 @@ public class PipelineRunner implements Observer {
             try {
                String msg = pr.run();
                if (pr.doesNotification()) MailUtils.send("Pipeline Complete", "Pipeline: " + pr.getPipelineFile() + " was succesfully completed  " + msg, pr.getEmailIds(), null, null);
+               System.out.println("Done");
+               System.exit(0);
             }catch(Exception e ) {
                 logger.info("Encountered exception " + e.getClass() + " ==> " + e.getLocalizedMessage());
                 e.printStackTrace();

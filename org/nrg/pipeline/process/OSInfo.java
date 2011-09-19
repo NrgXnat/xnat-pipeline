@@ -12,8 +12,6 @@ import org.nrg.pipeline.exception.PipelineException;
 import org.nrg.pipeline.utils.CommandStatementPresenter;
 import org.nrg.pipeline.xmlbeans.ResolvedStepDocument.ResolvedStep.ResolvedResource;
 
-import sun.security.krb5.internal.util.o;
-
 //////////////////////////////////////////////////////////////////////////
 //// ClassName
 /**

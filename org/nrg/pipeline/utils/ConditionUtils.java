@@ -47,6 +47,10 @@ public class ConditionUtils {
                if (!debug) rtn = FileUtils.fileExists(token);
             }else if (token.startsWith("!EXISTS")) {
                 if (!debug) rtn = !FileUtils.fileExists(token.substring(1));
+            }else if (token.equalsIgnoreCase("TRUE")) {
+                 rtn = true;
+            }else if (token.equalsIgnoreCase("FALSE")) {
+                 rtn = false;
             }else {
                 EvaluateConditionals c = new EvaluateConditionals();
                 rtn = c.getResult(pipelineData,token);
@@ -65,4 +69,8 @@ public class ConditionUtils {
     
 
     static Logger logger = Logger.getLogger(ConditionUtils.class);
+
+    public static void main(String[] args) {
+    	String condition = "";
+    }
 }

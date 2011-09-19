@@ -314,8 +314,8 @@ public class XPathResolverSaxon {
     public static void main(String args[]) {
         try {
             BasicConfigurator.configure();
-            XmlObject xmlObject = new XmlReader().read("C:\\DATA\\xnat_pipeline_v2\\textext1.xml");
-            ArrayList resolvedValues = XPathResolverSaxon.GetInstance().resolveXPathExpressions("/Parameters/parameter[name='target2']/values/unique/text()",xmlObject);
+            XmlObject xmlObject = new XmlReader().read("C:\\data\\build\\CNTRACS_UCD_QC\\20110425_220901\\archive_trigger\\Pat\\Pat_params_20110425220906.xml");
+            ArrayList resolvedValues = XPathResolverSaxon.GetInstance().resolveXPathExpressions("count(/Pipeline/parameters/parameter[name='bold']/values/list)",xmlObject);
             //ArrayList resolvedValues = XPathResolverSaxon.GetInstance().resolveXPathExpressions("nrgString:afterLastIndexofOrStr(/p:Parameters/p:parameter[p:name='target']/p:values/p:unique/text(),\"/\")",xmlObject);
             //ArrayList resolvedValues = XPathResolverSaxon.GetInstance().resolveXPathExpressions("nrgString:afterLastSlash(/Parameters/parameter[name='target']/values/unique/text())",xmlObject);
             System.out.println("ResolvedValues = " + resolvedValues.get(0));
