@@ -13,7 +13,7 @@ import javax.xml.transform.TransformerException;
 
 import org.apache.log4j.Logger;
 import org.nrg.pipeline.constants.PipelineConstants;
-import org.nrg.pipeline.exception.PipelineException;
+import org.nrg.pipeline.exception.PipelineEngineException;
 import org.nrg.pipeline.xmlbeans.PipelineData;
 import org.nrg.pipeline.xpath.XPathResolver;
 import org.nrg.pipeline.xpath.XPathResolverSaxon;
@@ -29,7 +29,7 @@ import org.nrg.pipeline.xpath.XPathResolverSaxon;
  */
 
 public class StepPreConditionUtils {
-    public static String resolvePreCondition(PipelineData pipelineData,  String preCondition) throws PipelineException {
+    public static String resolvePreCondition(PipelineData pipelineData,  String preCondition) throws PipelineEngineException {
         String rtn = "";
       // logger.info("Recd condition " + preCondition);
         ArrayList resolvedTokens = new ArrayList();
@@ -37,11 +37,11 @@ public class StepPreConditionUtils {
             try {
                 ArrayList values = XPathResolverSaxon.GetInstance().evaluate(pipelineData, preCondition);
                 if (values == null || !(values.size() > 0)) {
-                    throw new PipelineException("Couldnt resolve precondition  " + preCondition);
+                    throw new PipelineEngineException("Couldnt resolve precondition  " + preCondition);
                 }
                 return (String)values.get(0);
             } catch(TransformerException te) {
-                throw new PipelineException(te.getClass() + "==>" + te.getLocalizedMessage(), te);
+                throw new PipelineEngineException(te.getClass() + "==>" + te.getLocalizedMessage(), te);
             }
         }
         StringTokenizer st = new StringTokenizer(preCondition);
@@ -59,33 +59,33 @@ public class StepPreConditionUtils {
                     try {
                         ArrayList values = XPathResolverSaxon.GetInstance().evaluate(pipelineData,  xPathExpression);
                         if (values == null || !(values.size() > 0)) {
-                            throw new PipelineException("Couldnt resolve precondition  " + preCondition);
+                            throw new PipelineEngineException("Couldnt resolve precondition  " + preCondition);
                         }
                         resolvedTokens.add("EXISTS(" + (String)values.get(0) + ")");
                     } catch(TransformerException te) {
-                        throw new PipelineException(te.getClass() + "==>" + te.getLocalizedMessage(), te);
+                        throw new PipelineEngineException(te.getClass() + "==>" + te.getLocalizedMessage(), te);
                     }
                 }else if (token.startsWith("!EXISTS")) {
                     String xPathExpression = getArgumentToNotExists(token);
                     try {
                         ArrayList values = XPathResolverSaxon.GetInstance().evaluate(pipelineData,  xPathExpression);
                         if (values == null || !(values.size() > 0)) {
-                            throw new PipelineException("Couldnt resolve precondition  " + preCondition);
+                            throw new PipelineEngineException("Couldnt resolve precondition  " + preCondition);
                         }
                         resolvedTokens.add("!EXISTS(" + (String)values.get(0) + ")");
                     } catch(TransformerException te) {
-                        throw new PipelineException(te.getClass() + "==>" + te.getLocalizedMessage(), te);
+                        throw new PipelineEngineException(te.getClass() + "==>" + te.getLocalizedMessage(), te);
                     }
                 }
                 else if (token.startsWith(PipelineConstants.PIPELINE_XPATH_MARKER) && token.endsWith(PipelineConstants.PIPELINE_XPATH_MARKER)) {
                     try {
                         ArrayList values = XPathResolverSaxon.GetInstance().evaluate(pipelineData, token);
                         if (values == null || !(values.size() > 0)) {
-                            throw new PipelineException("Couldnt resolve precondition  " + preCondition);
+                            throw new PipelineEngineException("Couldnt resolve precondition  " + preCondition);
                         }
                         resolvedTokens.add((String)values.get(0));
                     } catch(TransformerException te) {
-                        throw new PipelineException(te.getClass() + "==>" + te.getLocalizedMessage(), te);
+                        throw new PipelineEngineException(te.getClass() + "==>" + te.getLocalizedMessage(), te);
                     }
                 }else {
                     //logger.debug("         Adding " + token);

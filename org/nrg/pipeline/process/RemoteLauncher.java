@@ -8,7 +8,7 @@ package org.nrg.pipeline.process;
 
 import java.io.InputStream;
 
-import org.nrg.pipeline.exception.PipelineException;
+import org.nrg.pipeline.exception.PipelineEngineException;
 import org.nrg.pipeline.utils.CommandStatementPresenter;
 import org.nrg.pipeline.utils.ssh2.MyUserInfo;
 
@@ -28,7 +28,7 @@ import com.jcraft.jsch.Session;
 
 public class RemoteLauncher {
     
-    public  String launchRemote(String host, String ssh2User, String ssh2Password, String ssh2Identity, CommandStatementPresenter command, boolean checkReturn, long maxwait) throws PipelineException {
+    public  String launchRemote(String host, String ssh2User, String ssh2Password, String ssh2Identity, CommandStatementPresenter command, boolean checkReturn, long maxwait) throws PipelineEngineException {
         JSch jsch = new JSch();
         Session session = null;
         boolean timedOut = false;
@@ -117,7 +117,7 @@ public class RemoteLauncher {
             channel.disconnect();
             return rtnStr;
         }catch(Exception e) {
-            throw new PipelineException("Unable to launch remote process using " + ssh2User + "@"+ host + " identity file " + ssh2Identity  + e.getLocalizedMessage(), e);
+            throw new PipelineEngineException("Unable to launch remote process using " + ssh2User + "@"+ host + " identity file " + ssh2Identity  + e.getLocalizedMessage(), e);
         }finally {
             if (session != null && session.isConnected()) {
                 session.disconnect();
@@ -125,7 +125,7 @@ public class RemoteLauncher {
         }
     }
     
-    public  String launchRemote(String host, String ssh2User, String ssh2Password, String ssh2Identity, CommandStatementPresenter command) throws PipelineException {
+    public  String launchRemote(String host, String ssh2User, String ssh2Password, String ssh2Identity, CommandStatementPresenter command) throws PipelineEngineException {
         return launchRemote(host, ssh2User, ssh2Password, ssh2Identity, command, true,-1);
     }
     

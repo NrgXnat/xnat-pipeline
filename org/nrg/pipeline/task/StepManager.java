@@ -16,7 +16,7 @@ import javax.xml.transform.TransformerException;
 import org.apache.log4j.Logger;
 import org.nrg.pipeline.constants.PipelineConstants;
 import org.nrg.pipeline.exception.ArgumentNotFoundException;
-import org.nrg.pipeline.exception.PipelineException;
+import org.nrg.pipeline.exception.PipelineEngineException;
 import org.nrg.pipeline.exception.PreConditionNotSatisfiedException;
 import org.nrg.pipeline.manager.ExecutionManager;
 import org.nrg.pipeline.manager.LaunchManager;
@@ -28,7 +28,7 @@ import org.nrg.pipeline.utils.LoopUtils;
 import org.nrg.pipeline.utils.Notification;
 import org.nrg.pipeline.utils.OutPutUtils;
 import org.nrg.pipeline.utils.ParameterUtils;
-import org.nrg.pipeline.utils.PipelineUtils;
+import org.nrg.pipeline.utils.PipelineEngineUtils;
 import org.nrg.pipeline.utils.ResourceUtils;
 import org.nrg.pipeline.utils.StepPreConditionUtils;
 import org.nrg.pipeline.utils.StepUtils;
@@ -79,7 +79,7 @@ public class StepManager {
     
     
     
-    public AllResolvedStepsDocument execute() throws PipelineException, PreConditionNotSatisfiedException, ArgumentNotFoundException, TransformerException {
+    public AllResolvedStepsDocument execute() throws PipelineEngineException, PreConditionNotSatisfiedException, ArgumentNotFoundException, TransformerException {
         setResolvedStepsDocument();
         AllResolvedStepsDocument rtn = AllResolvedStepsDocument.Factory.newInstance();
         AllResolvedSteps rtnAllStep = rtn.addNewAllResolvedSteps();
@@ -90,7 +90,7 @@ public class StepManager {
         ParameterUtils.copyParameters(pipelineDoc,rtnAllStep);
         boolean isLast = true;
         Steps steps = pipelineDoc.getPipeline().getSteps();
-        String savedfile = PipelineUtils.getResolvedPipelineXmlName(rtn);
+        String savedfile = PipelineEngineUtils.getResolvedPipelineXmlName(rtn);
         int stepIndex = 0;
         for (int i = startAt ; i < steps.sizeOfStepArray();) {
             int nextIndex = i+1;
@@ -121,7 +121,7 @@ public class StepManager {
                         if (!StepUtils.getStepId(aStep).equals(StepUtils.getStepId( steps.getStepArray(nextIndex)))) { //Not continuation of current step
                             ArrayList newIndices = XMLBeansUtils.getStepIndicesById(pipelineDoc.getPipeline(),aStep.getGotoStepId());
                             if (newIndices == null || !(newIndices.size() > 0))
-                                throw new PipelineException("Step " + aStep.getId().substring(0,aStep.getId().indexOf(":")) + " seems to have an invalid gotoStepId = " + aStep.getGotoStepId());
+                                throw new PipelineEngineException("Step " + aStep.getId().substring(0,aStep.getId().indexOf(":")) + " seems to have an invalid gotoStepId = " + aStep.getGotoStepId());
                             nextIndex = ((Integer)newIndices.get(0)).intValue();
                             try {
                                 if (!StepUtils.getStepId( steps.getStepArray(nextIndex)).equals(StepUtils.getStepId(aStep))) 
@@ -131,8 +131,8 @@ public class StepManager {
                     }
                     if (aStep.isSetPipelet()) {
                             String pathToPipelineDoc = FileUtils.getAbsolutePath(aStep.getPipelet().getLocation(), aStep.getPipelet().getName());
-                            PipelineDocument pipeletPipelineDoc = PipelineUtils.getPipelineDocument(pathToPipelineDoc);
-                            PipelineUtils.checkStepIds(pipeletPipelineDoc);
+                            PipelineDocument pipeletPipelineDoc = PipelineEngineUtils.getPipelineDocument(pathToPipelineDoc);
+                            PipelineEngineUtils.checkStepIds(pipeletPipelineDoc);
                             if (pipelineDoc.getPipeline().isSetOutputFileNamePrefix()) 
                                 pipeletPipelineDoc.getPipeline().setOutputFileNamePrefix(pipelineDoc.getPipeline().getOutputFileNamePrefix());
                             pipeletPipelineDoc.getPipeline().setName(pipelineDoc.getPipeline().getName());
@@ -143,7 +143,7 @@ public class StepManager {
                                 ParameterUtils.copyParameters(pipelineDoc,pipeletPipelineDoc);
                                 ParameterUtils.copyParameters(aStep, pipelineDoc, pipeletPipelineDoc);
                             }
-                            PipelineUtils.resolveXPath(pipeletPipelineDoc);
+                            PipelineEngineUtils.resolveXPath(pipeletPipelineDoc);
                             for (int j = 0; j < pipeletPipelineDoc.getPipeline().getSteps().getStepArray().length; j++) {
                             	Step pipeletStep = pipeletPipelineDoc.getPipeline().getSteps().getStepArray(j);
                             	pipeletStep.setId(aStep.getId() + "++" + pipeletStep.getId());
@@ -162,7 +162,7 @@ public class StepManager {
                                 if (primaryPipeline) {
                                     LaunchManager.registerStep(stepIndex);
                                 }
-                                ExecutionManager executionManager = new ExecutionManager(PipelineUtils.getPathToOutputFile(pipelineDoc,"OUTPUT"),PipelineUtils.getPathToOutputFile(pipelineDoc,"ERROR"));
+                                ExecutionManager executionManager = new ExecutionManager(PipelineEngineUtils.getPathToOutputFile(pipelineDoc,"OUTPUT"),PipelineEngineUtils.getPathToOutputFile(pipelineDoc,"ERROR"));
                                 executionManager.execute(stepDoc,nextIndexStr,  debug);
                                 for (int j = 0; j < stepDoc.getAllResolvedSteps().sizeOfResolvedStepArray(); j++) {
                                     ResolvedStep rStep = rtnAllStep.addNewResolvedStep();
@@ -184,10 +184,10 @@ public class StepManager {
                                 }catch(Exception e1){
                                     logger.debug("Unable to save pipeline document " + savedfile,e1);
                                 }
-                                if (e instanceof PipelineException) {
-                                	throw (PipelineException)e;
+                                if (e instanceof PipelineEngineException) {
+                                	throw (PipelineEngineException)e;
                                 }else 
-                                    throw new PipelineException("Unable to execute pipeline " ,e);
+                                    throw new PipelineEngineException("Unable to execute pipeline " ,e);
 
                             }
                         }
@@ -205,7 +205,7 @@ public class StepManager {
                 }
                 if (aStep.isSetAwaitApprovalToProceed()) {
                     if (!primaryPipeline) {
-                        throw new PipelineException("Await Approval to proceed set possibily on a pipelet for step " + aStep.getId());
+                        throw new PipelineEngineException("Await Approval to proceed set possibily on a pipelet for step " + aStep.getId());
                     }else {
                         //Look ahead to see if the next Step is expansion (due to PIPELINE_LOOPON) of the existing step or is a new step
                         if (i==steps.sizeOfStepArray()-1) { //is the last step 
@@ -248,7 +248,7 @@ public class StepManager {
         return (primaryPipeline==true);
     }
     
-    private void setResolvedStepsDocument() throws  PipelineException, ArgumentNotFoundException, PreConditionNotSatisfiedException , TransformerException{
+    private void setResolvedStepsDocument() throws  PipelineEngineException, ArgumentNotFoundException, PreConditionNotSatisfiedException , TransformerException{
         PipelineData pipelineData = pipelineDoc.getPipeline();
         if (pipelineData == null) return;
         StepUtils.resolveAttributes(pipelineDoc,pipelineData.getSteps());
@@ -256,7 +256,7 @@ public class StepManager {
         if (startAtStepId != null) {
             startAt = XMLBeansUtils.getStepIndexById(pipelineData,startAtStepId );
             if (startAt == -1) {
-                throw new PipelineException("Couldnt find Step with Id = " + startAtStepId);
+                throw new PipelineEngineException("Couldnt find Step with Id = " + startAtStepId);
             }
         }
         LaunchManager.setTotalSteps(steps.sizeOfStepArray() - startAt);
@@ -282,7 +282,7 @@ public class StepManager {
                             StepUtils.copy(resolvedDoc.getAllResolvedSteps().getResolvedStepArray(j), rStep);
                         }
                     }catch(TransformerException te) {
-                        throw new PipelineException("Couldnt construct internal representation. Encountered ",te);
+                        throw new PipelineEngineException("Couldnt construct internal representation. Encountered ",te);
                     }
                 }
             }
@@ -290,7 +290,7 @@ public class StepManager {
         }
     }
     
-    private AllResolvedStepsDocument getInternalRepresentation(PipelineDocument pipelineDoc, Step aStep) throws ArgumentNotFoundException, PipelineException, TransformerException {
+    private AllResolvedStepsDocument getInternalRepresentation(PipelineDocument pipelineDoc, Step aStep) throws ArgumentNotFoundException, PipelineEngineException, TransformerException {
         AllResolvedStepsDocument allStepsDoc = AllResolvedStepsDocument.Factory.newInstance();
         AllResolvedSteps allStep = allStepsDoc.addNewAllResolvedSteps();
         ResolvedStep rStep = allStep.addNewResolvedStep();
@@ -331,14 +331,14 @@ public class StepManager {
                 Resource aResource = aStep.getResourceArray(j);
                 ResourceDocument resourceDocument = ResourceManager.GetInstance().getResource(aResource);
                 if (resourceDocument == null) {
-                    throw new PipelineException("Couldnt not find " + aResource.getLocation() + File.separator + aResource.getName());
+                    throw new PipelineEngineException("Couldnt not find " + aResource.getLocation() + File.separator + aResource.getName());
                 }
                 resourceDocument.getResource().setDescription("");
                 ResourceData rscData;
                 try { rscData = resourceDocument.getResource(); } 
                 catch(NullPointerException ne ) {
                     logger.info("Possibly resource " + FileUtils.getAbsolutePath(aResource.getLocation(),aResource.getName()) + " at Step[" + aStep.getId() + "] doesnt exist");
-                    throw new PipelineException("Possibly resource " + FileUtils.getAbsolutePath(aResource.getLocation(),aResource.getName()) + " at Step[" + aStep.getId() + "] doesnt exist", ne);
+                    throw new PipelineEngineException("Possibly resource " + FileUtils.getAbsolutePath(aResource.getLocation(),aResource.getName()) + " at Step[" + aStep.getId() + "] doesnt exist", ne);
                 }
                 ResolvedResource internalResourceData = ResourceUtils.getInternalResourceData(resourceDocument);
                 int noOfArgumentsToSet = aResource.sizeOfArgumentArray();
@@ -356,7 +356,7 @@ public class StepManager {
                     if (stepArgument.sizeOfValueArray() == 0) {
                         if(!ResourceUtils.addArgumentToInternalResource(internalResourceData,argumentData,null)) {
                             logger.info(" ResourceUtils.addArgumentToInternalResource():: Coudlnt add Argument " + argumentData.getId() + " to Internal Resource " + rscData.getLocation() + File.separator + rscData.getName() + " at step " + aStep.getId());
-                            throw new PipelineException("Coudlnt add Argument " + argumentData.getId() + " to Internal Resource " + FileUtils.getAbsolutePath(rscData.getLocation(),rscData.getName()) + " at step " + aStep.getId());
+                            throw new PipelineEngineException("Coudlnt add Argument " + argumentData.getId() + " to Internal Resource " + FileUtils.getAbsolutePath(rscData.getLocation(),rscData.getName()) + " at step " + aStep.getId());
                         } 
                         continue;    
                     }
@@ -386,19 +386,19 @@ public class StepManager {
                             resolvedValues = XPathResolverSaxon.GetInstance().evaluate(pipelineDoc.getPipeline(),stepArgumentValues[l]);
                         }catch(TransformerException te) {
                             logger.info("getInternalRepresentation()::" + te.getLocalizedMessage() + " while parsing " + stepArgumentValues[l], te.getCause() );
-                            throw new PipelineException("Parsing " + stepArgumentValues[l] + te.getClass() + " ==> " + te.getLocalizedMessage(),te);
+                            throw new PipelineEngineException("Parsing " + stepArgumentValues[l] + te.getClass() + " ==> " + te.getLocalizedMessage(),te);
                         }
                         if (resolvedValues != null && resolvedValues.size() > 0) {
                             for (int m = 0; m < resolvedValues.size(); m++) {
                                 if(!ResourceUtils.addArgumentToInternalResource(internalResourceData,argumentData,(String)resolvedValues.get(m))) {
                                     logger.info(" ResourceUtils.addArgumentToInternalResource():: Coudlnt add Argument " + argumentData.getId() + " to Internal Resource " + rscData.getLocation() + File.separator + rscData.getName() + " at step " + aStep.getId());
-                                    throw new PipelineException("Coudlnt add Argument " + argumentData.getId() + " to Internal Resource " + FileUtils.getAbsolutePath(rscData.getLocation(),rscData.getName()) + " at step " + aStep.getId());
+                                    throw new PipelineEngineException("Coudlnt add Argument " + argumentData.getId() + " to Internal Resource " + FileUtils.getAbsolutePath(rscData.getLocation(),rscData.getName()) + " at step " + aStep.getId());
                                 } 
                             }
                         }else {
                             if(!ResourceUtils.addArgumentToInternalResource(internalResourceData,argumentData,stepArgumentValues[l])) {
                                 logger.info(" ResourceUtils.addArgumentToInternalResource():: Coudlnt add Argument " + argumentData.getId() + " to Internal Resource " + rscData.getLocation() + File.separator + rscData.getName() + " at step " + aStep.getId());
-                                throw new PipelineException("Coudlnt add Argument " + argumentData.getId() + " to Internal Resource " + FileUtils.getAbsolutePath(rscData.getLocation(),rscData.getName()) + " at step " + aStep.getId());
+                                throw new PipelineEngineException("Coudlnt add Argument " + argumentData.getId() + " to Internal Resource " + FileUtils.getAbsolutePath(rscData.getLocation(),rscData.getName()) + " at step " + aStep.getId());
                             } 
                             logger.debug("Couldnt resolve xpath expression on base document. Will try on the internal rep " + stepArgumentValues[l]);
                         }

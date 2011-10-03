@@ -13,7 +13,7 @@ import javax.xml.transform.TransformerException;
 import org.apache.log4j.BasicConfigurator;
 import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlObject;
-import org.nrg.pipeline.exception.PipelineException;
+import org.nrg.pipeline.exception.PipelineEngineException;
 import org.nrg.pipeline.utils.LoopUtils;
 import org.nrg.pipeline.utils.ParameterUtils;
 import org.nrg.pipeline.utils.XMLBeansUtils;
@@ -64,7 +64,7 @@ public class TestCreateXML {
         }catch (XmlException xmle ) {
             System.out.println(xmle.getLocalizedMessage());
             System.exit(1);
-        } catch(PipelineException ane) {
+        } catch(PipelineEngineException ane) {
             System.out.println(ane.getLocalizedMessage());
             System.exit(1);
         } catch(TransformerException ane) {

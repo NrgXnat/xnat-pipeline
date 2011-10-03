@@ -12,14 +12,14 @@ import javax.xml.transform.TransformerException;
 
 import org.apache.log4j.Logger;
 import org.nrg.pipeline.exception.ArgumentNotFoundException;
-import org.nrg.pipeline.exception.PipelineException;
+import org.nrg.pipeline.exception.PipelineEngineException;
 import org.nrg.pipeline.exception.PreConditionNotSatisfiedException;
 import org.nrg.pipeline.task.StepManager;
 import org.nrg.pipeline.utils.FileUtils;
 import org.nrg.pipeline.utils.LoopUtils;
 import org.nrg.pipeline.utils.ParameterUtils;
 import org.nrg.pipeline.utils.PipelineProperties;
-import org.nrg.pipeline.utils.PipelineUtils;
+import org.nrg.pipeline.utils.PipelineEngineUtils;
 import org.nrg.pipeline.xmlbeans.AllResolvedStepsDocument;
 import org.nrg.pipeline.xmlbeans.ParametersDocument;
 import org.nrg.pipeline.xmlbeans.PipelineDocument;
@@ -187,16 +187,16 @@ public class PipelineManager {
         return allStepsDoc;
     }
 */    
-    public Parameters launchPipeline(String pathToPipelineXml, ParametersDocument parameterDoc, String startAtStepId, boolean debug) throws PipelineException, ArgumentNotFoundException, PreConditionNotSatisfiedException, TransformerException {
-        PipelineDocument pipelineDoc = PipelineUtils.getPipelineDocument(pathToPipelineXml);
+    public Parameters launchPipeline(String pathToPipelineXml, ParametersDocument parameterDoc, String startAtStepId, boolean debug) throws PipelineEngineException, ArgumentNotFoundException, PreConditionNotSatisfiedException, TransformerException {
+        PipelineDocument pipelineDoc = PipelineEngineUtils.getPipelineDocument(pathToPipelineXml);
         ParameterUtils.addParameter(pipelineDoc, parameterDoc);
         launchPipeline(pipelineDoc, startAtStepId, debug);
         return pipelineDoc.getPipeline().getParameters();
     }
     
     
-    public Parameters launchPipeline(String pathToPipelineXml, String parameterFile, String startAtStepId, boolean debug) throws PipelineException, ArgumentNotFoundException, PreConditionNotSatisfiedException, TransformerException {
-        PipelineDocument pipelineDoc = PipelineUtils.getPipelineDocument(pathToPipelineXml);
+    public Parameters launchPipeline(String pathToPipelineXml, String parameterFile, String startAtStepId, boolean debug) throws PipelineEngineException, ArgumentNotFoundException, PreConditionNotSatisfiedException, TransformerException {
+        PipelineDocument pipelineDoc = PipelineEngineUtils.getPipelineDocument(pathToPipelineXml);
         if (parameterFile != null) {
             ParameterUtils.addParameter(pipelineDoc, parameterFile);
         }
@@ -205,27 +205,27 @@ public class PipelineManager {
     }
     
     
-    private void launchPipeline(PipelineDocument pipelineDoc, String startAtStepId, boolean debug) throws PipelineException, PreConditionNotSatisfiedException, ArgumentNotFoundException, TransformerException {
-        PipelineUtils.checkStepIds(pipelineDoc);
-        PipelineUtils.resolveXPath(pipelineDoc);
+    private void launchPipeline(PipelineDocument pipelineDoc, String startAtStepId, boolean debug) throws PipelineEngineException, PreConditionNotSatisfiedException, ArgumentNotFoundException, TransformerException {
+        PipelineEngineUtils.checkStepIds(pipelineDoc);
+        PipelineEngineUtils.resolveXPath(pipelineDoc);
         try {
             StepManager stepManager = new StepManager(pipelineDoc, startAtStepId, true);
             AllResolvedStepsDocument internal_repDoc = stepManager.execute();
-            String savedFile = PipelineUtils.getResolvedPipelineXmlName(internal_repDoc);
+            String savedFile = PipelineEngineUtils.getResolvedPipelineXmlName(internal_repDoc);
             try{
                 if (internal_repDoc != null) {
                     File saveDoc = new File(savedFile);
                     FileUtils.saveFile(saveDoc,internal_repDoc);
                 }
             }catch(Exception e1){
-                throw new PipelineException("Unable to save pipeline document " + savedFile,e1);
+                throw new PipelineEngineException("Unable to save pipeline document " + savedFile,e1);
             }
 
         }catch(Exception e){
             e.printStackTrace();
-            PipelineException pe1 = new PipelineException("Unable to complete pipeline " + e.getLocalizedMessage());
-            if (e instanceof PipelineException){
-            	PipelineException p = (PipelineException)e;
+            PipelineEngineException pe1 = new PipelineEngineException("Unable to complete pipeline " + e.getLocalizedMessage());
+            if (e instanceof PipelineEngineException){
+            	PipelineEngineException p = (PipelineEngineException)e;
 	            pe1.setErrorFileName(p.getOutputFileName());
 	            pe1.setOutputFileName(p.getErrorFileName());
             }
@@ -236,7 +236,7 @@ public class PipelineManager {
     private boolean launchPipeline(String pipelineXmlFile, PipelineDocument callerPipeline, boolean debug) throws PreConditionNotSatisfiedException {
         boolean success = true;
         try {
-            PipelineDocument pipelineDoc = PipelineUtils.getPipelineDocument(pipelineXmlFile);
+            PipelineDocument pipelineDoc = PipelineEngineUtils.getPipelineDocument(pipelineXmlFile);
             if (callerPipeline != null) {
                 if (callerPipeline.getPipeline().isSetOutputFileNamePrefix())
                     pipelineDoc.getPipeline().setOutputFileNamePrefix(callerPipeline.getPipeline().getOutputFileNamePrefix());
@@ -249,7 +249,7 @@ public class PipelineManager {
             return success;
         }catch(ArgumentNotFoundException ane) {
             logger.error(ane.getLocalizedMessage());
-        }catch(PipelineException ane) {
+        }catch(PipelineEngineException ane) {
             logger.error(ane.getLocalizedMessage());
         }catch(TransformerException ane) {
             logger.error(ane.getLocalizedMessage());

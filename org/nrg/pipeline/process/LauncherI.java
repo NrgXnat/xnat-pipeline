@@ -6,7 +6,7 @@
 
 package org.nrg.pipeline.process;
 
-import org.nrg.pipeline.exception.PipelineException;
+import org.nrg.pipeline.exception.PipelineEngineException;
 import org.nrg.pipeline.utils.CommandStatementPresenter;
 import org.nrg.pipeline.utils.Notification;
 import org.nrg.pipeline.xmlbeans.ParameterData;
@@ -25,7 +25,7 @@ import org.nrg.pipeline.xmlbeans.ResolvedStepDocument.ResolvedStep.ResolvedResou
 
 public interface LauncherI {
     
-    public int launchProcess(ParameterData[] parameters, ResolvedStep rStep, CommandStatementPresenter  command, ResolvedResource rsc) throws PipelineException;
+    public int launchProcess(ParameterData[] parameters, ResolvedStep rStep, CommandStatementPresenter  command, ResolvedResource rsc) throws PipelineEngineException;
     
     public void setErrorFileName(String errorFileName);
     

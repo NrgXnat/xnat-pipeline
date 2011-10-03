@@ -17,7 +17,7 @@ import net.nbirn.prov.ProcessStep.Program;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Logger;
-import org.nrg.pipeline.exception.PipelineException;
+import org.nrg.pipeline.exception.PipelineEngineException;
 import org.nrg.pipeline.process.LocalProcessLauncher;
 import org.nrg.pipeline.process.OS;
 import org.nrg.pipeline.process.OSInfo;
@@ -53,7 +53,7 @@ public class ProvenanceUtils {
         processStep.setUser(System.getProperty("user.name"));
     }
     
-    private static void insertRemoteMachineDetails(ResolvedResource rsc, ProcessStep processStep) throws PipelineException{
+    private static void insertRemoteMachineDetails(ResolvedResource rsc, ProcessStep processStep) throws PipelineEngineException{
         Platform platform = null;
         platform = processStep.getPlatform();
         if (platform == null) platform = processStep.addNewPlatform();
@@ -66,7 +66,7 @@ public class ProvenanceUtils {
     
        
     
-    public static void addProcessStep(ResolvedStep rStep, CommandStatementPresenter command, ResolvedResource rsc, Calendar timeStamp, boolean debug ) throws PipelineException {
+    public static void addProcessStep(ResolvedStep rStep, CommandStatementPresenter command, ResolvedResource rsc, Calendar timeStamp, boolean debug ) throws PipelineEngineException {
         Provenance prov = rStep.getProvenance(); 
         if (  prov == null ) {
             prov = rStep.addNewProvenance();
@@ -162,7 +162,7 @@ public class ProvenanceUtils {
     }
     
     
-    public static String getProgramVersion(ResolvedResource rsc,  final int timeOut) throws PipelineException{
+    public static String getProgramVersion(ResolvedResource rsc,  final int timeOut) throws PipelineEngineException{
         String command = ArgumentUtils.getCommandWithoutArguments(rsc);
         String rtn = extractVersion(launchProcess(new CommandStatementPresenter(command + " --version",command + " --version"), OSInfo.GetInstance().isRemote(rsc), rsc.getSsh2Host(), rsc.getSsh2User(), rsc.getSsh2Password(), rsc.getSsh2Identity(),timeOut));
         if (rtn.equals(""))
@@ -170,7 +170,7 @@ public class ProvenanceUtils {
         return rtn;
     }
     
-    public static String launchProcess(CommandStatementPresenter command, boolean isRemote, String host, String user, String pwd, String identity, final int timeOut) throws PipelineException{
+    public static String launchProcess(CommandStatementPresenter command, boolean isRemote, String host, String user, String pwd, String identity, final int timeOut) throws PipelineEngineException{
         String rtn ="";
 
         if (isRemote) {
@@ -186,7 +186,7 @@ public class ProvenanceUtils {
                rtn = launcher.getStreamErrOutput();
             return rtn;
         }catch(Exception e) {
-            throw new PipelineException("ProvenanceUtils::getProgramVersion " + e.getClass() + " " + e.getLocalizedMessage(), e);
+            throw new PipelineEngineException("ProvenanceUtils::getProgramVersion " + e.getClass() + " " + e.getLocalizedMessage(), e);
         }
     }
     

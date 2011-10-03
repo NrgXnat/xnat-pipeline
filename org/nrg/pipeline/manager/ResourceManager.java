@@ -15,7 +15,7 @@ import org.apache.log4j.Logger;
 import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlObject;
 import org.apache.xmlbeans.XmlOptions;
-import org.nrg.pipeline.exception.PipelineException;
+import org.nrg.pipeline.exception.PipelineEngineException;
 import org.nrg.pipeline.process.LocalProcessLauncher;
 import org.nrg.pipeline.utils.CommandStatementPresenter;
 import org.nrg.pipeline.utils.FileUtils;
@@ -166,7 +166,7 @@ public class ResourceManager {
                 //  System.exit(1);
               // }
                // try {out.write("\n");}catch(IOException ioe) {}
-                catch(PipelineException pe) {
+                catch(PipelineEngineException pe) {
                     logger.debug("Encountered exception " + pe.getMessage());
                     System.out.println("Encountered exception " + pe.getMessage());
                     System.exit(1);
