@@ -31,7 +31,7 @@ import net.sf.saxon.trans.XPathException;
 import org.apache.log4j.Logger;
 import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlOptions;
-import org.nrg.pipeline.exception.PipelineException;
+import org.nrg.pipeline.exception.PipelineEngineException;
 import org.nrg.pipeline.manager.ResourceManager;
 import org.nrg.pipeline.xmlbeans.PipelineDocument;
 import org.nrg.pipeline.xmlbeans.ResourceData;
@@ -144,7 +144,7 @@ public class ResourceUtils {
      *  
      */
     
-    public static void createResourcesForArguments(PipelineDocument pipelineDoc, ResolvedStep rStep,  ResolvedResource internalSeedResourceData, ResourceData originalRscData, Hashtable argumentsWhichHavePipelineLoopOn, Resource stepResource, Step originalStep) throws PipelineException, TransformerException {
+    public static void createResourcesForArguments(PipelineDocument pipelineDoc, ResolvedStep rStep,  ResolvedResource internalSeedResourceData, ResourceData originalRscData, Hashtable argumentsWhichHavePipelineLoopOn, Resource stepResource, Step originalStep) throws PipelineEngineException, TransformerException {
         LinkedHashMap argumentsWithResolvedValues = resolvePipelineValues(pipelineDoc, rStep,internalSeedResourceData,originalRscData, argumentsWhichHavePipelineLoopOn);
         //LoggerUtils.print(argumentsWhichHavePipelineLoopOn);
         createResourcesForArguments(rStep,internalSeedResourceData,originalRscData, argumentsWithResolvedValues, stepResource, originalStep);
@@ -152,7 +152,7 @@ public class ResourceUtils {
         argumentsWithResolvedValues  = null;
     }
 
-    private static LinkedHashMap resolvePipelineValues(PipelineDocument pipelineDoc, ResolvedStep rStep,  ResolvedResource internalSeedResourceData, ResourceData originalRscData, Hashtable argumentsWhichHavePipelineLoopOn) throws PipelineException, TransformerException{
+    private static LinkedHashMap resolvePipelineValues(PipelineDocument pipelineDoc, ResolvedStep rStep,  ResolvedResource internalSeedResourceData, ResourceData originalRscData, Hashtable argumentsWhichHavePipelineLoopOn) throws PipelineEngineException, TransformerException{
         Enumeration loopOnStmts = argumentsWhichHavePipelineLoopOn.keys();
         LinkedHashMap argumentsWithResolvedLoopOnStmts = new LinkedHashMap();
         while(loopOnStmts.hasMoreElements()) {
@@ -189,7 +189,7 @@ public class ResourceUtils {
     }
     
     
-    private static void createResourcesForArguments(ResolvedStep rStep, ResolvedResource internalSeedResourceData, ResourceData originalRscData, LinkedHashMap argumentsWhichHavePipelineLoopOn, Resource stepResource, Step originalStep) throws PipelineException{
+    private static void createResourcesForArguments(ResolvedStep rStep, ResolvedResource internalSeedResourceData, ResourceData originalRscData, LinkedHashMap argumentsWhichHavePipelineLoopOn, Resource stepResource, Step originalStep) throws PipelineEngineException{
        ArrayList internalSeedResourceDataArray = new ArrayList();
        internalSeedResourceDataArray.add(internalSeedResourceData);
        internalSeedResourceDataArray = getNewResources(internalSeedResourceDataArray, originalRscData, argumentsWhichHavePipelineLoopOn, stepResource);
@@ -210,7 +210,7 @@ public class ResourceUtils {
     
     
     
-    public static ArrayList resolveXPathExpressions (ArrayList xStmts, ResolvedResource xmlObj) throws PipelineException{
+    public static ArrayList resolveXPathExpressions (ArrayList xStmts, ResolvedResource xmlObj) throws PipelineEngineException{
         ArrayList rtn = new ArrayList();
         for (int i = 0; i < xStmts.size(); i++) {
             rtn.addAll(resolveXPathExpression((String)xStmts.get(i),xmlObj));
@@ -218,7 +218,7 @@ public class ResourceUtils {
         return rtn;
     }
     
-    private static ArrayList resolveXPathExpression (String xStmt, ResolvedResource rsc) throws PipelineException {
+    private static ArrayList resolveXPathExpression (String xStmt, ResolvedResource rsc) throws PipelineEngineException {
         ArrayList rtn = new ArrayList();
         if (rsc == null ) return rtn;
         try {
@@ -252,12 +252,12 @@ public class ResourceUtils {
             }
             return rtn;
         }catch(XPathException e) {
-            throw new PipelineException("Encountered " + e.getClass() + "==>" + e.getLocalizedMessage(), e);
+            throw new PipelineEngineException("Encountered " + e.getClass() + "==>" + e.getLocalizedMessage(), e);
         }
     }
     
     
-    private static void resolveOutput(ResolvedResource rsc, ResolvedStep rStep, Step originalStep) throws PipelineException{
+    private static void resolveOutput(ResolvedResource rsc, ResolvedStep rStep, Step originalStep) throws PipelineEngineException{
         //ResourceDocument rscDoc = ResourceDocument.Factory.newInstance();
         //rscDoc.setResource(rsc); 
         if (OutPutUtils.selfContainedOutput(originalStep)) return;
@@ -391,7 +391,7 @@ public class ResourceUtils {
     
 
     
-    private static ArrayList getNewResources(ArrayList internalSeedResourceDataList, ResourceData originalRscData, LinkedHashMap argumentsWhichHavePipelineLoopOn, Resource stepResource) throws PipelineException{
+    private static ArrayList getNewResources(ArrayList internalSeedResourceDataList, ResourceData originalRscData, LinkedHashMap argumentsWhichHavePipelineLoopOn, Resource stepResource) throws PipelineEngineException{
         ArrayList resourcesWithLoopValuesResolved = new ArrayList();
         if (argumentsWhichHavePipelineLoopOn != null && argumentsWhichHavePipelineLoopOn.size() > 0) {
             int commonLength = getCommonLength(argumentsWhichHavePipelineLoopOn);
@@ -408,7 +408,7 @@ public class ResourceUtils {
                     }
                     if(!ResourceUtils.addArgumentToInternalResource(rsc,arg,(String)resolvedValues.get(m))) {
                         logger.info("getNewResources():: Coudlnt add Argument " + arg.getId() + " to Internal Resource " + originalRscData.getLocation() + File.separator + originalRscData.getName());
-                        throw new PipelineException("Coudlnt add Argument " + arg.getId() + " to Internal Resource " + FileUtils.getAbsolutePath(originalRscData.getLocation(), originalRscData.getName()));
+                        throw new PipelineEngineException("Coudlnt add Argument " + arg.getId() + " to Internal Resource " + FileUtils.getAbsolutePath(originalRscData.getLocation(), originalRscData.getName()));
                     }
                     resourcesWithLoopValuesResolved.add(rsc);
                 }
@@ -422,7 +422,7 @@ public class ResourceUtils {
                 for (int i = 0; i < commonLength; i++) {
                     if(!ResourceUtils.addArgumentToInternalResource((ResolvedResource)resourcesWithLoopValuesResolved.get(i),arg,(String)resolvedValues.get(i))) {
                         logger.info("getNewResources():: Coudlnt add Argument " + arg.getId() + " to Internal Resource " + originalRscData.getLocation() + File.separator + originalRscData.getName());
-                        throw new PipelineException("Coudlnt add Argument " + arg.getId() + " to Internal Resource " + FileUtils.getAbsolutePath(originalRscData.getLocation(), originalRscData.getName()));
+                        throw new PipelineEngineException("Coudlnt add Argument " + arg.getId() + " to Internal Resource " + FileUtils.getAbsolutePath(originalRscData.getLocation(), originalRscData.getName()));
                     }
                 }
             }

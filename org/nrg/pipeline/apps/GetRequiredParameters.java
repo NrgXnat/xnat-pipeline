@@ -11,9 +11,9 @@ import java.io.IOException;
 
 import org.apache.log4j.BasicConfigurator;
 import org.apache.xmlbeans.XmlOptions;
-import org.nrg.pipeline.exception.PipelineException;
+import org.nrg.pipeline.exception.PipelineEngineException;
 import org.nrg.pipeline.utils.ParameterUtils;
-import org.nrg.pipeline.utils.PipelineUtils;
+import org.nrg.pipeline.utils.PipelineEngineUtils;
 //import org.nrg.pipeline.xmlbeans.ParameterDocument;
 import org.nrg.pipeline.xmlbeans.PipelineDocument;
 
@@ -48,8 +48,8 @@ public class GetRequiredParameters {
         }
     }
 
-    public void saveParameterDocument() throws PipelineException, IOException{
-       PipelineDocument pipelineDoc = PipelineUtils.getPipelineDocument(pipelineFileName);
+    public void saveParameterDocument() throws PipelineEngineException, IOException{
+       PipelineDocument pipelineDoc = PipelineEngineUtils.getPipelineDocument(pipelineFileName);
        System.out.println("Loaded pipeline XML " + pipelineFileName);
        //ParameterDocument param = ParameterUtils.getParameterDocument(pipelineDoc, all);
       // if (param != null) {
@@ -78,7 +78,7 @@ public class GetRequiredParameters {
                 grParam.showUsage(); System.exit(1);
             }
             grParam.saveParameterDocument();
-        }catch(PipelineException pe) {
+        }catch(PipelineEngineException pe) {
             System.out.println(pe.getClass() + "==>" + pe.getLocalizedMessage());
             System.exit(1);
         }catch(IOException pe) {

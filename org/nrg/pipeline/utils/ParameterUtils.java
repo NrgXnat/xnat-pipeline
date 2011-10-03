@@ -17,7 +17,7 @@ import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlObject;
 import org.apache.xmlbeans.XmlOptions;
 import org.nrg.pipeline.constants.PipelineConstants;
-import org.nrg.pipeline.exception.PipelineException;
+import org.nrg.pipeline.exception.PipelineEngineException;
 import org.nrg.pipeline.xmlbeans.AllResolvedStepsDocument;
 import org.nrg.pipeline.xmlbeans.ParameterData;
 import org.nrg.pipeline.xmlbeans.ParametersDocument;
@@ -94,7 +94,7 @@ public class ParameterUtils {
     
     
     
-        public static void addParameter(PipelineDocument pipelineDoc, ParametersDocument parameterDoc) throws PipelineException {
+        public static void addParameter(PipelineDocument pipelineDoc, ParametersDocument parameterDoc) throws PipelineEngineException {
             if (parameterDoc.getParameters() != null ) {
                 for (int i = 0; i < parameterDoc.getParameters().getParameterArray().length; i++) {
                    ParameterData param =  parameterDoc.getParameters().getParameterArray(i);
@@ -131,12 +131,12 @@ public class ParameterUtils {
         
     
     
-    public static void addParameter(PipelineDocument pipelineDoc, String parameterFile) throws PipelineException {
+    public static void addParameter(PipelineDocument pipelineDoc, String parameterFile) throws PipelineEngineException {
         try {
             XmlObject xmlObject = new XmlReader().read(parameterFile);
             if (!(xmlObject instanceof ParametersDocument)) {
                 logger.error("addParameter() :: Invalid XML file supplied. Expecting a parameter document"); 
-                throw new PipelineException("Invalid XML file supplied " + parameterFile + " ==> Expecting a parameters document");
+                throw new PipelineEngineException("Invalid XML file supplied " + parameterFile + " ==> Expecting a parameters document");
             }
             ParametersDocument parameterDoc = (ParametersDocument)xmlObject; 
             String errors = XMLBeansUtils.validateAndGetErrors(parameterDoc);
@@ -146,20 +146,20 @@ public class ParameterUtils {
             addParameter(pipelineDoc,parameterDoc);
         }catch(IOException ioe) {
             logger.error("File not found " + parameterFile);
-            throw new PipelineException(ioe.getClass() + "==>" + ioe.getLocalizedMessage(), ioe);
+            throw new PipelineEngineException(ioe.getClass() + "==>" + ioe.getLocalizedMessage(), ioe);
         }catch (XmlException xmle ) {
             logger.error(xmle.getLocalizedMessage());
-            throw new PipelineException(xmle.getClass() + "==>" + xmle.getLocalizedMessage(),xmle);
-        }catch(PipelineException ane) {
+            throw new PipelineEngineException(xmle.getClass() + "==>" + xmle.getLocalizedMessage(),xmle);
+        }catch(PipelineEngineException ane) {
             ane.printStackTrace();
             logger.error(ane.getLocalizedMessage());
-            throw new PipelineException(ane.getClass() + "==>" + ane.getLocalizedMessage(),ane);
+            throw new PipelineEngineException(ane.getClass() + "==>" + ane.getLocalizedMessage(),ane);
         }
         
     }
     
     
-    public static void setParameterValues(PipelineDocument pipelineDoc) throws PipelineException, TransformerException{
+    public static void setParameterValues(PipelineDocument pipelineDoc) throws PipelineEngineException, TransformerException{
             String xPathToParameter = PipelineConstants.PIPELINE_XPATH_MARKER + "/Pipeline/parameters/parameter" + PipelineConstants.PIPELINE_XPATH_MARKER;
             XmlObject[] params = XPathUtils.executeQuery(pipelineDoc,xPathToParameter);
             PipelineData pipelineData = pipelineDoc.getPipeline();
@@ -175,14 +175,14 @@ public class ParameterUtils {
             }
     }
     
-    private static void resolveParameterValues(PipelineData pipelineData, ParameterData aParam, ParameterData resolvedParam) throws PipelineException, TransformerException {
+    private static void resolveParameterValues(PipelineData pipelineData, ParameterData aParam, ParameterData resolvedParam) throws PipelineEngineException, TransformerException {
         Values aValues = aParam.getValues();
         Values resolvedValues = resolvedParam.getValues();
         if (resolvedValues == null) resolvedValues = resolvedParam.addNewValues();
         if (aValues.isSetUnique()) {
             ArrayList xparamValues = XPathResolverSaxon.GetInstance().evaluate(pipelineData, aValues.getUnique());
             if (xparamValues != null && xparamValues.size() > 1) {
-                throw new PipelineException("Incorrect formulation of the Pipeline xml. Check the Parameter node  " + aParam.xmlText());
+                throw new PipelineEngineException("Incorrect formulation of the Pipeline xml. Check the Parameter node  " + aParam.xmlText());
             }
             resolvedValues.setUnique((String)xparamValues.get(0));
         }else {
@@ -192,7 +192,7 @@ public class ParameterUtils {
                     for (int k = 0; k < xparamValues.size(); k++) {
                         resolvedValues.addList((String)xparamValues.get(k));
                     }
-                }else throw new PipelineException("Couldnt resolve xpath expression " + aValues.getListArray(i));                
+                }else throw new PipelineEngineException("Couldnt resolve xpath expression " + aValues.getListArray(i));                
             }
         }
     }
@@ -217,7 +217,7 @@ public class ParameterUtils {
         
     }
     
-    public static void copyParameters(Step aStep, PipelineDocument from, PipelineDocument to) throws PipelineException, TransformerException {
+    public static void copyParameters(Step aStep, PipelineDocument from, PipelineDocument to) throws PipelineEngineException, TransformerException {
         if (aStep == null || to == null) 
             return;
         PipelineData toPipeline = to.getPipeline();

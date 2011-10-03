@@ -9,7 +9,7 @@ package org.nrg.pipeline.utils;
 import java.util.ArrayList;
 
 import org.nfunk.jep.JEP;
-import org.nrg.pipeline.exception.PipelineException;
+import org.nrg.pipeline.exception.PipelineEngineException;
 import org.nrg.pipeline.xmlbeans.PipelineData;
 import org.nrg.pipeline.xpath.XPathResolverSaxon;
 
@@ -33,7 +33,7 @@ public class EvaluateConditionals {
         myParser.parseExpression(expr);
     }
 
-    public boolean getResult(PipelineData pipelineData, String expr) throws PipelineException {
+    public boolean getResult(PipelineData pipelineData, String expr) throws PipelineEngineException {
         boolean rtn = false;
         try {
             ArrayList stms = new ArrayList(); stms.add(expr);
@@ -45,7 +45,7 @@ public class EvaluateConditionals {
     }
 
     
-    public boolean getResult(String expr) throws PipelineException {
+    public boolean getResult(String expr) throws PipelineEngineException {
         boolean rtn = false;
         Object result;
         String errorInfo;
@@ -60,7 +60,7 @@ public class EvaluateConditionals {
         result = myParser.getValueAsObject();
         // Get the error information
         if ((errorInfo = myParser.getErrorInfo()) != null) {
-            throw new PipelineException(errorInfo);
+            throw new PipelineEngineException(errorInfo);
         } 
         // Is the result ok?
         if (result!=null) {

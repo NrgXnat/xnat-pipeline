@@ -8,7 +8,7 @@ package org.nrg.pipeline.test;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.BasicConfigurator;
-import org.nrg.pipeline.exception.PipelineException;
+import org.nrg.pipeline.exception.PipelineEngineException;
 import org.nrg.pipeline.process.LocalProcessLauncher;
 import org.nrg.pipeline.process.RemoteLauncher;
 import org.nrg.pipeline.utils.CommandStatementPresenter;
@@ -26,7 +26,7 @@ import org.nrg.pipeline.utils.CommandStatementPresenter;
 public class TestVersion {
 
     
-    public String getProgramVersion(String command, boolean isRemote, String host, String user, String pwd, String identity, final int timeOut) throws PipelineException{
+    public String getProgramVersion(String command, boolean isRemote, String host, String user, String pwd, String identity, final int timeOut) throws PipelineEngineException{
         String rtn = getBestGuessProgramVersion(command + " --version", isRemote, host, user, pwd, identity,timeOut);
         if (rtn.equals(""))
             rtn = getBestGuessProgramVersion(command + " -version", isRemote, host, user, pwd, identity,timeOut);
@@ -73,7 +73,7 @@ public class TestVersion {
         return rtn;
     }
     
-    public String getBestGuessProgramVersion(String command, boolean isRemote, String host, String user, String pwd, String identity, final int timeOut) throws PipelineException{
+    public String getBestGuessProgramVersion(String command, boolean isRemote, String host, String user, String pwd, String identity, final int timeOut) throws PipelineEngineException{
         String rtn ="";
         int exitVal = 0;
         if (isRemote) {
@@ -90,7 +90,7 @@ public class TestVersion {
                rtn = launcher.getStreamErrOutput();
             return extractVersion(rtn);
         }catch(Exception e) {
-            throw new PipelineException("ProvenanceUtils::getProgramVersion " + e.getClass() + " " + e.getLocalizedMessage(), e);
+            throw new PipelineEngineException("ProvenanceUtils::getProgramVersion " + e.getClass() + " " + e.getLocalizedMessage(), e);
         }
     }
     

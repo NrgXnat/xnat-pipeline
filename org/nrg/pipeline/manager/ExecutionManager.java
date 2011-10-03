@@ -12,7 +12,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 
 import org.apache.log4j.Logger;
-import org.nrg.pipeline.exception.PipelineException;
+import org.nrg.pipeline.exception.PipelineEngineException;
 import org.nrg.pipeline.exception.PreConditionNotSatisfiedException;
 import org.nrg.pipeline.process.LauncherI;
 import org.nrg.pipeline.process.LocalExecutableLauncher;
@@ -25,7 +25,7 @@ import org.nrg.pipeline.utils.CommandStatementPresenter;
 import org.nrg.pipeline.utils.FileUtils;
 import org.nrg.pipeline.utils.Notification;
 import org.nrg.pipeline.utils.PipeUtils;
-import org.nrg.pipeline.utils.PipelineUtils;
+import org.nrg.pipeline.utils.PipelineEngineUtils;
 import org.nrg.pipeline.utils.XMLBeansUtils;
 import org.nrg.pipeline.xmlbeans.AllResolvedStepsDocument;
 import org.nrg.pipeline.xmlbeans.ParameterData;
@@ -58,12 +58,12 @@ public class ExecutionManager {
         }
     }
     
-    public void execute(AllResolvedStepsDocument resolvedDoc, String nextStep, boolean debug) throws PipelineException, PreConditionNotSatisfiedException {
+    public void execute(AllResolvedStepsDocument resolvedDoc, String nextStep, boolean debug) throws PipelineEngineException, PreConditionNotSatisfiedException {
         FileUtils.touchDir(outputFileName);
         
         ResolvedStep[] resolvedSteps = resolvedDoc.getAllResolvedSteps().getResolvedStepArray();
         Notification notification =  LaunchManager.getNotification();
-        String savedFile = PipelineUtils.getResolvedPipelineXmlName(resolvedDoc);
+        String savedFile = PipelineEngineUtils.getResolvedPipelineXmlName(resolvedDoc);
         //notification.setPipelineTimeLaunched(LaunchManager.getLaunchTime());
         //notification.setPathTopipelineDecsriptor(resolvedDoc.getAllResolvedSteps().getLocation() + File.separator + resolvedDoc.getAllResolvedSteps().getName());
         for (int j = 0; j < resolvedSteps.length;) {
@@ -93,7 +93,7 @@ public class ExecutionManager {
                             if (errorFileName!= null)
                                 notification.setMessage("See " + errorFileName + " for errors");
                             logger.fatal(" Execution of " + logStmt + "at Step[id= "+ resolvedSteps[j].getId()+  "] was unsuccesfull");
-                            PipelineException pe = new PipelineException(" Execution of " + logStmt + "at Step[id= "+ resolvedSteps[j].getId()+  "] was unsuccesfull");
+                            PipelineEngineException pe = new PipelineEngineException(" Execution of " + logStmt + "at Step[id= "+ resolvedSteps[j].getId()+  "] was unsuccesfull");
                             pe.setErrorFileName(errorFileName);
                             pe.setOutputFileName(outputFileName);
                             throw pe;
@@ -105,7 +105,7 @@ public class ExecutionManager {
                             FileUtils.saveFile(saveDoc,resolvedDoc);
                         }catch(Exception e){
                             notification.setStatus("Failed to save Pipeline Descriptor file");
-                            PipelineException pe = new PipelineException("Unable to save pipeline document " + savedFile,e);
+                            PipelineEngineException pe = new PipelineEngineException("Unable to save pipeline document " + savedFile,e);
                             pe.setErrorFileName(errorFileName);
                             pe.setOutputFileName(outputFileName);
                             throw pe;
@@ -113,12 +113,12 @@ public class ExecutionManager {
                         notification.setStatus("Running");
                         //AdminUtils.fireNotification(notification);
                     }
-                }catch(PipelineException pe) {
+                }catch(PipelineEngineException pe) {
                     resolvedSteps[j].setStatus(ResolvedStep.Status.FAILED);
                     notification.setStatus("Failed");
                     AdminUtils.fireNotification(notification);
                     logger.fatal(" Execution of " + logStmt + "at Step[id= "+ resolvedSteps[j].getId()+  "] was unsuccesfull");
-                    PipelineException pe1 = new PipelineException(" Execution of " + logStmt + "at Step[id= "+ resolvedSteps[j].getId()+  "] was unsuccesfull",pe);
+                    PipelineEngineException pe1 = new PipelineEngineException(" Execution of " + logStmt + "at Step[id= "+ resolvedSteps[j].getId()+  "] was unsuccesfull",pe);
                     pe1.setErrorFileName(errorFileName);
                     pe1.setOutputFileName(outputFileName);
                     throw pe1;
@@ -143,7 +143,7 @@ public class ExecutionManager {
 
    
     
-    private int launch(ParameterData[] parameters, ResolvedStep rStep, CommandStatementPresenter cmdStmt, ResolvedResource rsc, Notification notification, boolean debug) throws PipelineException {
+    private int launch(ParameterData[] parameters, ResolvedStep rStep, CommandStatementPresenter cmdStmt, ResolvedResource rsc, Notification notification, boolean debug) throws PipelineEngineException {
         int rtn = 1;
         LauncherI execLauncher = null;
         if (rsc.getType().equals(ResourceData.Type.EXECUTABLE)) {

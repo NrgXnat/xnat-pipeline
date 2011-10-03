@@ -9,7 +9,7 @@ package org.nrg.pipeline.process;
 import java.io.File;
 
 import org.apache.log4j.Logger;
-import org.nrg.pipeline.exception.PipelineException;
+import org.nrg.pipeline.exception.PipelineEngineException;
 import org.nrg.pipeline.utils.CommandStatementPresenter;
 import org.nrg.pipeline.utils.StreamGobbler;
 
@@ -33,7 +33,7 @@ public class LocalProcessLauncher {
         cmdArray = null;
     }
     
-    public void launchProcess(CommandStatementPresenter command,String workDirectory, final long timeOut) throws PipelineException {
+    public void launchProcess(CommandStatementPresenter command,String workDirectory, final long timeOut) throws PipelineEngineException {
         try {  
             setCommand(command);
             File dir = null;
@@ -41,7 +41,7 @@ public class LocalProcessLauncher {
                 dir = new File(workDirectory);
                 if (!dir.exists()) {
                     logger.info("Work Directory: " + workDirectory + " doesnt exist ");
-                    throw new PipelineException("Work Directory: " + workDirectory + " doesnt exist ");
+                    throw new PipelineEngineException("Work Directory: " + workDirectory + " doesnt exist ");
                 }
                 logger.info("Command to be executed in " + workDirectory);
             }
@@ -99,7 +99,7 @@ public class LocalProcessLauncher {
             System.out.println("Unable to launch " + command);
             t.printStackTrace();
             logger.info("Problem launching command " + command,t);
-            throw new PipelineException(t.getClass() + "==>" +  t.getLocalizedMessage());
+            throw new PipelineEngineException(t.getClass() + "==>" +  t.getLocalizedMessage());
         }    
     }
     /**

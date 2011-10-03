@@ -8,7 +8,7 @@ package org.nrg.pipeline.process;
 
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Logger;
-import org.nrg.pipeline.exception.PipelineException;
+import org.nrg.pipeline.exception.PipelineEngineException;
 import org.nrg.pipeline.utils.AdminUtils;
 import org.nrg.pipeline.utils.CommandStatementPresenter;
 import org.nrg.pipeline.utils.Notification;
@@ -31,7 +31,7 @@ import org.nrg.pipeline.xmlbeans.ResolvedStepDocument.ResolvedStep.ResolvedResou
 public class LocalExecutableLauncher implements LauncherI {
     
     public int launchProcess(ParameterData[] parameters, ResolvedStep rStep, CommandStatementPresenter command,
-            ResolvedResource rsc) throws PipelineException {
+            ResolvedResource rsc) throws PipelineEngineException {
         String workDirectory = rStep.getWorkdirectory();
         notification = new Notification();
         int exitVal = -1;
@@ -51,7 +51,7 @@ public class LocalExecutableLauncher implements LauncherI {
             return exitVal;
         } catch (Throwable t) {
             logger.info("Problem launching command " + command,t);
-            throw new PipelineException(t.getClass() + "==>" +  t.getLocalizedMessage());
+            throw new PipelineEngineException(t.getClass() + "==>" +  t.getLocalizedMessage());
         }    
     }
     

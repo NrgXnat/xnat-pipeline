@@ -31,7 +31,7 @@ import org.apache.xmlbeans.XmlObject;
 import org.apache.xmlbeans.XmlOptions;
 import org.apache.xmlbeans.XmlCursor.TokenType;
 import org.nrg.pipeline.constants.PipelineConstants;
-import org.nrg.pipeline.exception.PipelineException;
+import org.nrg.pipeline.exception.PipelineEngineException;
 import org.nrg.pipeline.utils.LoopUtils;
 import org.nrg.pipeline.utils.XMLBeansUtils;
 import org.nrg.pipeline.xmlbeans.PipelineData;
@@ -59,16 +59,16 @@ public class XPathResolverSaxon {
         return self;
     }
     
-    public ArrayList evaluate(PipelineData pipelineData, String xPathExpr) throws TransformerException, PipelineException {
+    public ArrayList evaluate(PipelineData pipelineData, String xPathExpr) throws TransformerException, PipelineEngineException {
         ArrayList rtn = new ArrayList();
         //System.out.println("          " + xPathExpr);
         if (xPathExpr == null) {
-            throw new PipelineException("evaluate():: null values supplied for xPathExpression");
+            throw new PipelineEngineException("evaluate():: null values supplied for xPathExpression");
         }
         String expression = xPathExpr.trim().substring(0);
         if (expression.startsWith(PipelineConstants.PIPELINE_XPATH_MARKER)) {
             if (!expression.endsWith(PipelineConstants.PIPELINE_XPATH_MARKER)) {
-                throw new PipelineException("XPathResolverSaxon::evaluate():: Missing " + PipelineConstants.PIPELINE_XPATH_MARKER + " at the end of expression " + expression);
+                throw new PipelineEngineException("XPathResolverSaxon::evaluate():: Missing " + PipelineConstants.PIPELINE_XPATH_MARKER + " at the end of expression " + expression);
             }
             String xPathExpression = expression.substring(1,expression.length()-1);
             ArrayList resolvedExpr = null;
@@ -93,7 +93,7 @@ public class XPathResolverSaxon {
         return rtn;
     }
     
-    private ArrayList resolveLoop(PipelineData pipelineData, Object xpathExpr, String loopStr) throws PipelineException{
+    private ArrayList resolveLoop(PipelineData pipelineData, Object xpathExpr, String loopStr) throws PipelineEngineException{
         ArrayList rtn = null;
         ArrayList loopValues = null;
         ArrayList input = null;
@@ -103,7 +103,7 @@ public class XPathResolverSaxon {
         }else if (xpathExpr instanceof ArrayList) {
             input = (ArrayList)xpathExpr;
         }else {
-            throw new PipelineException("Input Argument of type " + xpathExpr.getClass() + " not supported");
+            throw new PipelineEngineException("Input Argument of type " + xpathExpr.getClass() + " not supported");
         }
         if (input == null) return null;
         for (int j = 0; j < input.size(); j++ ) {
@@ -120,7 +120,7 @@ public class XPathResolverSaxon {
                if (endLoopOnMarker != -1) {
                    //System.out.println("Loop ID is " + loopId);
                    if (loopId.startsWith(PipelineConstants.PIPELINE_XPATH_MARKER) && !loopId.endsWith(PipelineConstants.PIPELINE_XPATH_MARKER) ) {
-                       throw new PipelineException("Illegal token encountered while parsing " + xpathExpression + " [Missing " + PipelineConstants.PIPELINE_XPATH_MARKER +" ] in  pipeline identified by " + pipelineData.getName());
+                       throw new PipelineEngineException("Illegal token encountered while parsing " + xpathExpression + " [Missing " + PipelineConstants.PIPELINE_XPATH_MARKER +" ] in  pipeline identified by " + pipelineData.getName());
                    }else if (loopId.startsWith(PipelineConstants.PIPELINE_XPATH_MARKER) && loopId.endsWith(PipelineConstants.PIPELINE_XPATH_MARKER)) {
                        PipelineDocument pipelineDoc = PipelineDocument.Factory.newInstance();
                        pipelineDoc.setPipeline(pipelineData);
@@ -128,7 +128,7 @@ public class XPathResolverSaxon {
                    }else
                    loopValues = XMLBeansUtils.getLoopValuesById(pipelineData,loopId);
                }else {
-                   throw new PipelineException("Illegal token encountered while parsing " + xpathExpression + " [Missing )] in  pipeline identified by " + pipelineData.getName());
+                   throw new PipelineEngineException("Illegal token encountered while parsing " + xpathExpression + " [Missing )] in  pipeline identified by " + pipelineData.getName());
                }
                if (loopValues != null) {
                    if (rtn == null) rtn = new ArrayList();
@@ -147,7 +147,7 @@ public class XPathResolverSaxon {
         return rtn;
     }
     
-    public  ArrayList resolveXPathExpressions (ArrayList xStmts, XmlObject xmlObj) throws PipelineException{
+    public  ArrayList resolveXPathExpressions (ArrayList xStmts, XmlObject xmlObj) throws PipelineEngineException{
         ArrayList rtn = new ArrayList();
         for (int i = 0; i < xStmts.size(); i++) {
             rtn.addAll(resolveXPathExpressions((String)xStmts.get(i),xmlObj));
@@ -169,7 +169,7 @@ public class XPathResolverSaxon {
         return rtn;
     }*/
     
-    public  ArrayList resolveXPathExpressions (String xStmt, XmlObject xmlObj) throws PipelineException{
+    public  ArrayList resolveXPathExpressions (String xStmt, XmlObject xmlObj) throws PipelineEngineException{
         ArrayList rtn = new ArrayList();
         if (xmlObj == null ) return rtn;
         //System.out.println(" xStmt " + xStmt);
@@ -258,19 +258,19 @@ public class XPathResolverSaxon {
              //System.out.println(" " + xStmt + " " + rtn);
              return rtn;
         } catch (IllegalAccessException e) {
-            throw new PipelineException(xStmt + " Encountered " + e.getClass() + "==>" + e.getLocalizedMessage(),e);     
+            throw new PipelineEngineException(xStmt + " Encountered " + e.getClass() + "==>" + e.getLocalizedMessage(),e);     
         } catch (ClassNotFoundException e) {
-            throw new PipelineException(xStmt +" Encountered " + e.getClass() + "==>" + e.getLocalizedMessage(), e);
+            throw new PipelineEngineException(xStmt +" Encountered " + e.getClass() + "==>" + e.getLocalizedMessage(), e);
         }catch (NoSuchMethodException e) {
-            throw new PipelineException(xStmt +" Encountered " + e.getClass() + "==>" + e.getLocalizedMessage(), e);
+            throw new PipelineEngineException(xStmt +" Encountered " + e.getClass() + "==>" + e.getLocalizedMessage(), e);
         }catch (InvocationTargetException e) {
-            throw new PipelineException(xStmt +" Encountered " + e.getClass() + "==>" + e.getLocalizedMessage(), e); 
+            throw new PipelineEngineException(xStmt +" Encountered " + e.getClass() + "==>" + e.getLocalizedMessage(), e); 
         }catch(XPathException e) {
-            throw new PipelineException(xStmt +" Encountered " + e.getClass() + "==>" + e.getLocalizedMessage(), e);
+            throw new PipelineEngineException(xStmt +" Encountered " + e.getClass() + "==>" + e.getLocalizedMessage(), e);
         }
     }
     
-    private ArrayList resolveXPathExpressions (ArrayList xStmts,  PipelineData pipelineData) throws PipelineException, TransformerException{
+    private ArrayList resolveXPathExpressions (ArrayList xStmts,  PipelineData pipelineData) throws PipelineEngineException, TransformerException{
         ArrayList rtnList = new ArrayList();
         ArrayList rtn = new ArrayList();
         try {
@@ -290,7 +290,7 @@ public class XPathResolverSaxon {
         }
     }
  
-    private boolean pathNeedsToBeResolved(Object obj) throws PipelineException{
+    private boolean pathNeedsToBeResolved(Object obj) throws PipelineEngineException{
         boolean rtn = false;
         ArrayList input = null;
         if (obj instanceof String) {
@@ -298,7 +298,7 @@ public class XPathResolverSaxon {
         }else if (obj instanceof ArrayList) {
             input = (ArrayList)obj;
         }else {
-            throw new PipelineException("loopNeedsToBeResolved::Input Argument of type " + obj.getClass() + " not supported");
+            throw new PipelineEngineException("loopNeedsToBeResolved::Input Argument of type " + obj.getClass() + " not supported");
         }
         if (input == null) return rtn;
         for (int i = 0; i < input.size(); i++) {

@@ -23,7 +23,7 @@ import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 import org.apache.xmlbeans.XmlException;
 import org.nrg.pipeline.exception.ArgumentNotFoundException;
-import org.nrg.pipeline.exception.PipelineException;
+import org.nrg.pipeline.exception.PipelineEngineException;
 import org.nrg.pipeline.exception.PreConditionNotSatisfiedException;
 import org.nrg.pipeline.manager.EventManager;
 import org.nrg.pipeline.manager.PipelineManager;
@@ -137,7 +137,7 @@ public class PipelineRunner implements Observer {
         }
 
         
-        private String run()  throws PipelineException{
+        private String run()  throws PipelineEngineException{
             String msg = "";
             if (cmdArgs.getPipelineFile() == null) {
                 showUsage();
@@ -163,20 +163,20 @@ public class PipelineRunner implements Observer {
                 	}
                 }
             }catch(Exception e) {
-                throw new PipelineException("Pipeline Failed ", e);
+                throw new PipelineEngineException("Pipeline Failed ", e);
             }
             return msg;
         }
         
         
-        private String launchPipeline(String pathToParamFile) throws PipelineException, ArgumentNotFoundException, XmlException, PreConditionNotSatisfiedException, TransformerException {
+        private String launchPipeline(String pathToParamFile) throws PipelineEngineException, ArgumentNotFoundException, XmlException, PreConditionNotSatisfiedException, TransformerException {
             String msg = "";
             Parameters params = PipelineManager.GetInstance(cmdArgs.getConfigFile()).launchPipeline(cmdArgs.getPipelineFile(),pathToParamFile, cmdArgs.getStartAt(), cmdArgs.debug());
             msg = ParameterUtils.GetParameters(params);
             return msg;
         }
 
-        private String launchFromDirectory() throws PipelineException, ArgumentNotFoundException, XmlException, PreConditionNotSatisfiedException, TransformerException {
+        private String launchFromDirectory() throws PipelineEngineException, ArgumentNotFoundException, XmlException, PreConditionNotSatisfiedException, TransformerException {
             String msg = " in batch mode. Parameters sepecified in " + cmdArgs.getParameterDir() + " <br>";
             File paramdir = new File(cmdArgs.getParameterDir());
             String[] paramFiles = paramdir.list(new FilenameFilter() {
@@ -190,12 +190,12 @@ public class PipelineRunner implements Observer {
                 }
             }catch(Exception e) {
                 
-                throw new PipelineException("Unable to completely run pipeline in batch mode. Failed on file " + file,e);
+                throw new PipelineEngineException("Unable to completely run pipeline in batch mode. Failed on file " + file,e);
             }
             return msg;
         }    
         
-        private String launchFromCSV() throws PipelineException  {
+        private String launchFromCSV() throws PipelineEngineException  {
             String msg = " in batch mode. Parameters sepecified in " + cmdArgs.getCsvFile() + " <br>";
             int lastCompleteLineNumber = -1;
             try {
@@ -223,9 +223,9 @@ public class PipelineRunner implements Observer {
                 lastCompleteLineNumber = lcsvp.getLastLineNumber();
                 msg += " Last complete line number " + lastCompleteLineNumber;
             }catch(IOException io) {
-                throw new PipelineException("Unable to read CSV file " +  cmdArgs.getCsvFile(),io);
+                throw new PipelineEngineException("Unable to read CSV file " +  cmdArgs.getCsvFile(),io);
             }catch(Exception e) {
-                throw new PipelineException("Unable to completely run pipeline in batch mode. Last complete successful line number " + lastCompleteLineNumber + " from Csv File " + cmdArgs.getCsvFile() ,e);
+                throw new PipelineEngineException("Unable to completely run pipeline in batch mode. Last complete successful line number " + lastCompleteLineNumber + " from Csv File " + cmdArgs.getCsvFile() ,e);
             }
             return msg;
         }

@@ -14,7 +14,7 @@ import java.util.Random;
 import javax.xml.transform.TransformerException;
 
 import org.nrg.pipeline.constants.PipelineConstants;
-import org.nrg.pipeline.exception.PipelineException;
+import org.nrg.pipeline.exception.PipelineEngineException;
 import org.nrg.pipeline.xmlbeans.AllResolvedStepsDocument;
 import org.nrg.pipeline.xmlbeans.OutputData;
 import org.nrg.pipeline.xmlbeans.ParameterData;
@@ -207,7 +207,7 @@ public class StepUtils {
        }
    }*/
    
-   public static void resolveAttributes(PipelineDocument pipelineDoc, Steps steps) throws PipelineException{
+   public static void resolveAttributes(PipelineDocument pipelineDoc, Steps steps) throws PipelineEngineException{
        LinkedHashMap replace = new LinkedHashMap();
        Steps newSteps = Steps.Factory.newInstance();
        int initSizeOfStepArray = steps.sizeOfStepArray(); 
@@ -232,9 +232,9 @@ public class StepUtils {
                        if (values != null && values.size() > 0) 
                            aStep.setWorkdirectory((String)values.get(0));
                        else
-                           throw new PipelineException("Couldnt resolve " + aStep.getWorkdirectory()+  " XPath Expression for step[" + aStep.getId() +"]" );
+                           throw new PipelineEngineException("Couldnt resolve " + aStep.getWorkdirectory()+  " XPath Expression for step[" + aStep.getId() +"]" );
                    }catch(TransformerException te) {
-                       throw new PipelineException(te.getClass() + "==>" + te.getLocalizedMessage(), te);
+                       throw new PipelineEngineException(te.getClass() + "==>" + te.getLocalizedMessage(), te);
                    } 
                }
            }
@@ -297,7 +297,7 @@ public class StepUtils {
                                    if (values != null && values.size() > 0) 
                                        rStep.setWorkdirectory((String)values.get(0));
                                    else
-                                       throw new PipelineException("Couldnt resolve " + rStep.getWorkdirectory()+  " XPath Expression for step[" + rStep.getId() +"]" );
+                                       throw new PipelineEngineException("Couldnt resolve " + rStep.getWorkdirectory()+  " XPath Expression for step[" + rStep.getId() +"]" );
                                }
                                if (rStep.isSetPrecondition()) {
                                    //rStep.setPrecondition(StepPreConditionUtils.resolvePreCondition(pipelineDoc.getPipeline(),  rStep.getPrecondition())); 
@@ -308,7 +308,7 @@ public class StepUtils {
                                   //     throw new PipelineException("Couldnt resolve " + rStep.getPrecondition()+  " XPath Expression for step[" + rStep.getId() +"]" );
                                }
                            }catch(TransformerException te) {
-                               throw new PipelineException(te.getClass() + "==>" + te.getLocalizedMessage(), te);
+                               throw new PipelineEngineException(te.getClass() + "==>" + te.getLocalizedMessage(), te);
                            } 
                        }
                    }
@@ -358,7 +358,7 @@ public class StepUtils {
                    }else if (rStep.isSetWorkdirectory()) {
                        path = rStep.getWorkdirectory();
                    }
-                   if (path == null) throw new PipelineException("For the step " + rStep.getId() + " and output file " + j + " neither the path nor the working directory is set");    
+                   if (path == null) throw new PipelineEngineException("For the step " + rStep.getId() + " and output file " + j + " neither the path nor the working directory is set");    
                    if (values != null && values.size() > 0) {
                        rStep.getOutputArray(j).getFile().setName((String)values.get(0));
                        if (rStep.getOutputArray(j).getFile().isSetPath()) {
@@ -369,9 +369,9 @@ public class StepUtils {
                        }
                    }
                    else
-                       throw new PipelineException("Couldnt resolve " + rStep.getWorkdirectory()+  " XPath Expression for step[" + rStep.getId() +"]" );
+                       throw new PipelineEngineException("Couldnt resolve " + rStep.getWorkdirectory()+  " XPath Expression for step[" + rStep.getId() +"]" );
                }catch(TransformerException te) {
-                   throw new PipelineException(te.getClass() + "==>" + te.getLocalizedMessage(), te);
+                   throw new PipelineEngineException(te.getClass() + "==>" + te.getLocalizedMessage(), te);
                } 
            }
        }
@@ -425,7 +425,7 @@ public class StepUtils {
    }*/
   
    
-   public static void resolveAttributes(PipelineData pipelineData,  Step step) throws PipelineException {
+   public static void resolveAttributes(PipelineData pipelineData,  Step step) throws PipelineEngineException {
        //if (step.isSetPrecondition()) {
         //   step.setPrecondition(StepPreConditionUtils.resolvePreCondition(pipelineData,  step.getPrecondition()));
       // }
@@ -435,14 +435,14 @@ public class StepUtils {
                if (values != null && values.size() > 0) 
                    step.setWorkdirectory((String)values.get(0));
                else
-                   throw new PipelineException("Couldnt resolve " + step.getWorkdirectory()+  " XPath Expression for step[" + step.getId() +"]" );
+                   throw new PipelineEngineException("Couldnt resolve " + step.getWorkdirectory()+  " XPath Expression for step[" + step.getId() +"]" );
            }catch(TransformerException te) {
-               throw new PipelineException(te.getClass() + "==>" + te.getLocalizedMessage(), te);
+               throw new PipelineEngineException(te.getClass() + "==>" + te.getLocalizedMessage(), te);
            }
        }
    }
 
-   public static void resolveAttributes(PipelineDocument pipelineDoc) throws PipelineException{
+   public static void resolveAttributes(PipelineDocument pipelineDoc) throws PipelineEngineException{
        resolveAttributes(pipelineDoc, pipelineDoc.getPipeline().getSteps());        
    }
     
