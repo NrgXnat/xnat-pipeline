@@ -20,7 +20,7 @@ import org.apache.log4j.Logger;
 import org.apache.xpath.XPathAPI;
 import org.apache.xpath.objects.XObject;
 import org.nrg.pipeline.constants.PipelineConstants;
-import org.nrg.pipeline.exception.PipelineException;
+import org.nrg.pipeline.exception.PipelineEngineException;
 import org.nrg.pipeline.utils.LoopUtils;
 import org.nrg.pipeline.utils.XMLBeansUtils;
 import org.nrg.pipeline.xmlbeans.PipelineData;
@@ -47,15 +47,15 @@ public class XPathResolver {
            return self;
        }
        
-       public ArrayList evaluate(PipelineData pipelineData, Node xmlElement, String xPathExpr) throws TransformerException, PipelineException {
+       public ArrayList evaluate(PipelineData pipelineData, Node xmlElement, String xPathExpr) throws TransformerException, PipelineEngineException {
            ArrayList rtn = new ArrayList();
            if (xPathExpr == null) {
-               throw new PipelineException("evaluate():: null values supplied for xPathExpression");
+               throw new PipelineEngineException("evaluate():: null values supplied for xPathExpression");
            }
            String expression = xPathExpr.substring(0);
            if (expression.startsWith(PipelineConstants.PIPELINE_XPATH_MARKER)) {
                if (!expression.endsWith(PipelineConstants.PIPELINE_XPATH_MARKER)) {
-                   throw new PipelineException("XPathResolver::evaluate():: Missing $ at the end of expression " + expression);
+                   throw new PipelineEngineException("XPathResolver::evaluate():: Missing $ at the end of expression " + expression);
                }
                String xPathExpression = expression.substring(1,expression.length()-1);
                ArrayList resolvedExpr = null;
@@ -80,7 +80,7 @@ public class XPathResolver {
            return rtn;
        }
        
-       private ArrayList getValues(Object inObj) throws  TransformerException, PipelineException{
+       private ArrayList getValues(Object inObj) throws  TransformerException, PipelineEngineException{
            ArrayList rtn = new ArrayList();
            ArrayList input = null;
            try {
@@ -89,7 +89,7 @@ public class XPathResolver {
                }else if (inObj instanceof ArrayList) {
                    input = (ArrayList)inObj;
                }else {
-                   throw new PipelineException("Input Argument of type " + inObj.getClass() + " not supported");
+                   throw new PipelineEngineException("Input Argument of type " + inObj.getClass() + " not supported");
                }
                if (input == null) return null;
                for (int j = 0; j < input.size(); j++) {
@@ -129,7 +129,7 @@ public class XPathResolver {
            return rtn;
        }
        
-       private ArrayList resolveLoop(PipelineData pipelineData, Object xpathExpr, String loopStr) throws PipelineException{
+       private ArrayList resolveLoop(PipelineData pipelineData, Object xpathExpr, String loopStr) throws PipelineEngineException{
            ArrayList rtn = null;
            ArrayList loopValues = null;
            ArrayList input = null;
@@ -139,7 +139,7 @@ public class XPathResolver {
            }else if (xpathExpr instanceof ArrayList) {
                input = (ArrayList)xpathExpr;
            }else {
-               throw new PipelineException("Input Argument of type " + xpathExpr.getClass() + " not supported");
+               throw new PipelineEngineException("Input Argument of type " + xpathExpr.getClass() + " not supported");
            }
            if (input == null) return null;
            for (int j = 0; j < input.size(); j++ ) {
@@ -152,7 +152,7 @@ public class XPathResolver {
                       String loopId = xpathExpression.substring(indexOfLoopOn + loopStr.length()+1,endLoopOnMarker);
                       loopValues = XMLBeansUtils.getLoopValuesById(pipelineData,loopId);
                   }else {
-                      throw new PipelineException("Illegal token encountered while parsing " + xpathExpression + " [Missing )] in  pipeline identified by " + pipelineData.getName());
+                      throw new PipelineEngineException("Illegal token encountered while parsing " + xpathExpression + " [Missing )] in  pipeline identified by " + pipelineData.getName());
                   }
                   if (loopValues != null) {
                       if (rtn == null) rtn = new ArrayList();
@@ -171,7 +171,7 @@ public class XPathResolver {
            return rtn;
        }
 
-       public  ArrayList resolveXPathExpressions (ArrayList xStmts, Node xmlElement) throws PipelineException, TransformerException{
+       public  ArrayList resolveXPathExpressions (ArrayList xStmts, Node xmlElement) throws PipelineEngineException, TransformerException{
            ArrayList rtn = new ArrayList();
            try {
                for (int i = 0; i < xStmts.size(); i++) {
@@ -185,7 +185,7 @@ public class XPathResolver {
            }
        }
        
-       private ArrayList resolveXPathExpressions (ArrayList xStmts, Node xmlElement, PipelineData pipelineData) throws PipelineException, TransformerException{
+       private ArrayList resolveXPathExpressions (ArrayList xStmts, Node xmlElement, PipelineData pipelineData) throws PipelineEngineException, TransformerException{
            ArrayList rtnList = new ArrayList();
            ArrayList rtn = new ArrayList();
            try {
@@ -207,7 +207,7 @@ public class XPathResolver {
            }
        }
     
-       private boolean pathNeedsToBeResolved(Object obj) throws PipelineException{
+       private boolean pathNeedsToBeResolved(Object obj) throws PipelineEngineException{
            boolean rtn = false;
            ArrayList input = null;
            if (obj instanceof String) {
@@ -215,7 +215,7 @@ public class XPathResolver {
            }else if (obj instanceof ArrayList) {
                input = (ArrayList)obj;
            }else {
-               throw new PipelineException("loopNeedsToBeResolved::Input Argument of type " + obj.getClass() + " not supported");
+               throw new PipelineEngineException("loopNeedsToBeResolved::Input Argument of type " + obj.getClass() + " not supported");
            }
            if (input == null) return rtn;
            for (int i = 0; i < input.size(); i++) {

@@ -16,7 +16,7 @@ import javax.xml.transform.TransformerException;
 import org.apache.log4j.Logger;
 import org.apache.xmlbeans.XmlObject;
 import org.nrg.pipeline.constants.PipelineConstants;
-import org.nrg.pipeline.exception.PipelineException;
+import org.nrg.pipeline.exception.PipelineEngineException;
 import org.nrg.pipeline.xmlbeans.Loop;
 import org.nrg.pipeline.xmlbeans.PipelineData;
 import org.nrg.pipeline.xmlbeans.PipelineDocument;
@@ -59,14 +59,14 @@ public class LoopUtils {
                     }
                 }
             }
-        }catch(PipelineException pe) {
+        }catch(PipelineEngineException pe) {
            logger.info("setLoopValues():: " + pe.getLocalizedMessage());
         }catch (TransformerException te) {
             logger.info("setLoopValues():: " + te.getLocalizedMessage());
         }
     }
     
-   public static String getLoopOnId(PipelineData pipelineData, String xpathExpression, boolean returnLoopId) throws PipelineException {
+   public static String getLoopOnId(PipelineData pipelineData, String xpathExpression, boolean returnLoopId) throws PipelineEngineException {
        String rtn = null;
        if (xpathExpression == null) return rtn;
        int indexOfLoopOn = xpathExpression.indexOf(PipelineConstants.PIPELINE_LOOPON);
@@ -82,13 +82,13 @@ public class LoopUtils {
               else 
                   rtn = xpathExpression.substring(indexOfLoopOn ,endLoopOnMarker+1);
           }else {
-              throw new PipelineException("Illegal token encountered while parsing " + xpathExpression + " [Missing )] in  pipeline identified by " + pipelineData.getName());
+              throw new PipelineEngineException("Illegal token encountered while parsing " + xpathExpression + " [Missing )] in  pipeline identified by " + pipelineData.getName());
           }
        }
        return rtn;
    }
    
-   public static String getLoopValueId(PipelineData pipelineData, String xpathExpression, boolean returnLoopId) throws PipelineException {
+   public static String getLoopValueId(PipelineData pipelineData, String xpathExpression, boolean returnLoopId) throws PipelineEngineException {
        String rtn = null;
        if (xpathExpression == null) return rtn;
        int indexOfLoopValue = xpathExpression.indexOf(PipelineConstants.PIPELINE_LOOPVALUE);
@@ -104,14 +104,14 @@ public class LoopUtils {
               else 
                   rtn = xpathExpression.substring(indexOfLoopValue ,endLoopValueMarker+1);
           }else {
-              throw new PipelineException("Illegal token encountered while parsing " + xpathExpression + " [Missing )] in  pipeline identified by " + pipelineData.getName());
+              throw new PipelineEngineException("Illegal token encountered while parsing " + xpathExpression + " [Missing )] in  pipeline identified by " + pipelineData.getName());
           }
        }
        return rtn;
    }
    
     
-    public static String loopNeedsToBeResolved(Object obj) throws PipelineException{
+    public static String loopNeedsToBeResolved(Object obj) throws PipelineEngineException{
         String rtn = null;
         ArrayList input = null;
         if (obj instanceof String) {
@@ -119,9 +119,9 @@ public class LoopUtils {
         }else if (obj instanceof ArrayList) {
             input = (ArrayList)obj;
         }else {
-            if (obj != null) throw new PipelineException("Input Argument of type " + obj.getClass() + " not supported");
+            if (obj != null) throw new PipelineEngineException("Input Argument of type " + obj.getClass() + " not supported");
             else {
-                throw new PipelineException("Input Argument of type not supported....argument could be null");
+                throw new PipelineEngineException("Input Argument of type not supported....argument could be null");
             }
         }
         if (input == null) return rtn;
@@ -147,11 +147,11 @@ public class LoopUtils {
      * 
      * @param loopStr is one of PIPELINE_LOOPVALUE or PIPELINE_LOOPON
      */
-    public static String getExpressionWhichIsBeingLooped(String xpathExpression, String loopStr, char openingChar,char closingChar) throws PipelineException {
+    public static String getExpressionWhichIsBeingLooped(String xpathExpression, String loopStr, char openingChar,char closingChar) throws PipelineEngineException {
         String rtn = null;
         if (xpathExpression == null || loopStr == null) return rtn;
         int indexOfLoopOn = xpathExpression.indexOf(loopStr);
-        if (indexOfLoopOn == -1) throw new PipelineException("Couldnt locate presence of " + loopStr + " in " + xpathExpression);
+        if (indexOfLoopOn == -1) throw new PipelineEngineException("Couldnt locate presence of " + loopStr + " in " + xpathExpression);
         /* Stores the start index of ( as key and end index of matching ) as value */
         Hashtable startKeyEndValueHash = new Hashtable();
         /* Traverse through the string looking for (. Put the ( in the stack, 
@@ -167,8 +167,8 @@ public class LoopUtils {
                 openingCharStack.push(openingCharStr);
                 openingIndexStack.push(new Integer(i));
             }else if (xpathExpression.charAt(i)==closingChar) {
-                if (openingCharStack.empty()) throw new PipelineException("Expression " + xpathExpression + " has mismatched " + openingChar + " and " + closingChar + "....possibly no " + openingChar);
-                if (!openingCharStack.peek().equals(openingCharStr)) throw new PipelineException("Expression " + xpathExpression + " has mismatched " + openingChar + " and " + closingChar);
+                if (openingCharStack.empty()) throw new PipelineEngineException("Expression " + xpathExpression + " has mismatched " + openingChar + " and " + closingChar + "....possibly no " + openingChar);
+                if (!openingCharStack.peek().equals(openingCharStr)) throw new PipelineEngineException("Expression " + xpathExpression + " has mismatched " + openingChar + " and " + closingChar);
                 else {
                     openingCharStack.pop();
                     Integer start = (Integer)openingIndexStack.pop();
@@ -181,7 +181,7 @@ public class LoopUtils {
             Integer key = (Integer)enume.nextElement();
             System.out.println("Key + " + key + " value " + startKeyEndValueHash.get(key));
         }*/
-        if (!openingCharStack.empty()) throw new PipelineException("Expression " + xpathExpression + " has mismatched " + openingChar + " and " + closingChar + " ....possibly excess " + openingChar);
+        if (!openingCharStack.empty()) throw new PipelineEngineException("Expression " + xpathExpression + " has mismatched " + openingChar + " and " + closingChar + " ....possibly excess " + openingChar);
         int startIndex  = indexOfLoopOn + loopStr.length();
         int endIndex = ((Integer)startKeyEndValueHash.get(new Integer(startIndex))).intValue();
         rtn = xpathExpression.substring(startIndex+1, endIndex);

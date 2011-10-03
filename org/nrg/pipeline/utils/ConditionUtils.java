@@ -11,7 +11,7 @@ import java.util.StringTokenizer;
 
 import org.apache.log4j.Logger;
 import org.nrg.pipeline.constants.PipelineConstants;
-import org.nrg.pipeline.exception.PipelineException;
+import org.nrg.pipeline.exception.PipelineEngineException;
 import org.nrg.pipeline.xmlbeans.AllResolvedStepsDocument;
 import org.nrg.pipeline.xmlbeans.PipelineData;
 
@@ -26,7 +26,7 @@ import org.nrg.pipeline.xmlbeans.PipelineData;
  */
 
 public class ConditionUtils {
-    public static Boolean checkCondition(PipelineData pipelineData, String condition, boolean debug) throws PipelineException {
+    public static Boolean checkCondition(PipelineData pipelineData, String condition, boolean debug) throws PipelineEngineException {
         boolean rtn = false;
         String expr = "";
         logger.info("Condition: " + condition);

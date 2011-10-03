@@ -18,7 +18,7 @@ import org.apache.log4j.BasicConfigurator;
 import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlObject;
 import org.apache.xpath.XPathAPI;
-import org.nrg.pipeline.exception.PipelineException;
+import org.nrg.pipeline.exception.PipelineEngineException;
 import org.nrg.pipeline.utils.XMLBeansUtils;
 import org.nrg.pipeline.xmlbeans.PipelineDocument;
 import org.nrg.pipeline.xmlreader.XmlReader;
@@ -67,7 +67,7 @@ public class TestXalanWithXMLBeans {
         }catch (XmlException xmle ) {
             System.out.println(xmle.getLocalizedMessage());
             System.exit(1);
-        }catch (PipelineException ple ) {
+        }catch (PipelineEngineException ple ) {
             System.out.println(ple.getLocalizedMessage());
             System.exit(1);
         }catch (TransformerException ple ) {

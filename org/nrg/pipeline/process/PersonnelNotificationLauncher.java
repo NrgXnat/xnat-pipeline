@@ -19,7 +19,7 @@ import java.util.Calendar;
 import org.apache.commons.mail.EmailAttachment;
 import org.apache.commons.mail.HtmlEmail;
 import org.apache.log4j.Logger;
-import org.nrg.pipeline.exception.PipelineException;
+import org.nrg.pipeline.exception.PipelineEngineException;
 import org.nrg.pipeline.utils.AdminUtils;
 import org.nrg.pipeline.utils.CommandStatementPresenter;
 import org.nrg.pipeline.utils.Notification;
@@ -45,7 +45,7 @@ import org.nrg.pipeline.xmlbeans.ResolvedStepDocument.ResolvedStep.ResolvedResou
 public class PersonnelNotificationLauncher implements LauncherI {
 
     public int launchProcess(ParameterData[] parameters, ResolvedStep rStep, CommandStatementPresenter command,
-            ResolvedResource rsc) throws PipelineException {
+            ResolvedResource rsc) throws PipelineEngineException {
         notification = new Notification();
         if (!rsc.getType().equals(ResourceData.Type.HUMAN)) {
             logger.debug("Recd a non-human resource type");
@@ -63,7 +63,7 @@ public class PersonnelNotificationLauncher implements LauncherI {
                 	//Read the file
                 	toArgs = new ArrayList();
                 	File toFile = new File(tolist.getValue());
-                	if (!toFile.exists()) throw new PipelineException("Email file list not found at " + tolist.getValue());
+                	if (!toFile.exists()) throw new PipelineEngineException("Email file list not found at " + tolist.getValue());
                 	FileReader fr = new FileReader(toFile);
                 	BufferedReader br = new BufferedReader(fr);
                 	String s;
@@ -117,7 +117,7 @@ public class PersonnelNotificationLauncher implements LauncherI {
                 if (bodyArg == null)  {
                 	if (bodycontents != null) {
                        	File bodyFile = new File(bodycontents.getValue());
-                    	if (!bodyFile.exists()) throw new PipelineException(" File containing email body not found at " + bodycontents.getValue());
+                    	if (!bodyFile.exists()) throw new PipelineEngineException(" File containing email body not found at " + bodycontents.getValue());
                     	FileReader fr = new FileReader(bodyFile);
                     	BufferedReader br = new BufferedReader(fr);
                       	String s;
@@ -183,7 +183,7 @@ public class PersonnelNotificationLauncher implements LauncherI {
                     out.close();
                 }
             }catch(Exception e1){}
-            throw new PipelineException("Personnel notification email couldnt be sent " + e.getClass() + e.getLocalizedMessage(),e);
+            throw new PipelineEngineException("Personnel notification email couldnt be sent " + e.getClass() + e.getLocalizedMessage(),e);
         }
         
     }

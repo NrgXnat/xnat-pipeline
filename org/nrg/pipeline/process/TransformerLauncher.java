@@ -14,7 +14,7 @@ import java.util.Calendar;
 
 import org.apache.log4j.Logger;
 import org.nrg.pipeline.converter.XmlParamsToCshParams;
-import org.nrg.pipeline.exception.PipelineException;
+import org.nrg.pipeline.exception.PipelineEngineException;
 import org.nrg.pipeline.utils.AdminUtils;
 import org.nrg.pipeline.utils.CommandStatementPresenter;
 import org.nrg.pipeline.utils.Notification;
@@ -38,7 +38,7 @@ import org.nrg.pipeline.xmlbeans.ResolvedStepDocument.ResolvedStep.ResolvedResou
 public class TransformerLauncher implements LauncherI  {
 	
     public int launchProcess(ParameterData[] parameters, ResolvedStep rStep, CommandStatementPresenter command,
-            ResolvedResource rsc) throws PipelineException {
+            ResolvedResource rsc) throws PipelineEngineException {
         notification = new Notification();
         if (!rsc.getType().equals(ResourceData.Type.TRANSFORMER)) {
             logger.debug("Recd a non-transformer resource type");
@@ -84,7 +84,7 @@ public class TransformerLauncher implements LauncherI  {
                     out.close();
                 }
             }catch(Exception e1){}
-            throw new PipelineException("Parameters couldnt be transformed " + e.getClass() + e.getLocalizedMessage(),e);
+            throw new PipelineEngineException("Parameters couldnt be transformed " + e.getClass() + e.getLocalizedMessage(),e);
         }
         
     }

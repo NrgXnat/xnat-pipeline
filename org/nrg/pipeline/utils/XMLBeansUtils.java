@@ -24,7 +24,7 @@ import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlObject;
 import org.apache.xmlbeans.XmlOptions;
 import org.nrg.pipeline.constants.PipelineConstants;
-import org.nrg.pipeline.exception.PipelineException;
+import org.nrg.pipeline.exception.PipelineEngineException;
 import org.nrg.pipeline.xmlbeans.AllResolvedStepsDocument;
 import org.nrg.pipeline.xmlbeans.ArgumentData;
 import org.nrg.pipeline.xmlbeans.Loop;
@@ -314,7 +314,7 @@ public class XMLBeansUtils {
     }
     
     
-    public static Document getDomDocument(XmlObject xo) throws PipelineException {
+    public static Document getDomDocument(XmlObject xo) throws PipelineEngineException {
         try {
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
             // MUST be TRUE or can't get back to bean land
@@ -333,7 +333,7 @@ public class XMLBeansUtils {
         } catch(Exception e) {
             System.out.println("getDomDocument " + e.getLocalizedMessage());
             logger.error("getDomDocument():: Encountered exception " + e.getClass(),e.getCause());
-            throw new PipelineException(e.getClass() + "::" + e.getLocalizedMessage(), e);
+            throw new PipelineEngineException(e.getClass() + "::" + e.getLocalizedMessage(), e);
         }
     }
     

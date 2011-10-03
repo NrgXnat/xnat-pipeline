@@ -13,7 +13,7 @@ import java.io.InputStream;
 import java.util.Calendar;
 
 import org.apache.log4j.Logger;
-import org.nrg.pipeline.exception.PipelineException;
+import org.nrg.pipeline.exception.PipelineEngineException;
 import org.nrg.pipeline.utils.AdminUtils;
 import org.nrg.pipeline.utils.CommandStatementPresenter;
 import org.nrg.pipeline.utils.Notification;
@@ -40,7 +40,7 @@ import com.jcraft.jsch.Session;
 public class RemoteExecutableLauncher implements LauncherI {
 
     public int launchProcess(ParameterData[] parameters, ResolvedStep rStep, CommandStatementPresenter command,
-            ResolvedResource rsc) throws PipelineException {
+            ResolvedResource rsc) throws PipelineEngineException {
         int rtn = 1;
         notification = new Notification();
         String cmd = "";
@@ -137,7 +137,7 @@ public class RemoteExecutableLauncher implements LauncherI {
         return rtn;
     }catch(Exception e) {
         e.printStackTrace();
-        throw new PipelineException("Unable to launch remote process using " + rsc.getSsh2User() + "@"+ rsc.getSsh2Host() + " identity file " + rsc.getSsh2Identity()  + e.getLocalizedMessage(),e);
+        throw new PipelineEngineException("Unable to launch remote process using " + rsc.getSsh2User() + "@"+ rsc.getSsh2Host() + " identity file " + rsc.getSsh2Identity()  + e.getLocalizedMessage(),e);
     }
 
     }

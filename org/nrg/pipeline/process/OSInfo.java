@@ -8,7 +8,7 @@ package org.nrg.pipeline.process;
 
 import java.util.Hashtable;
 
-import org.nrg.pipeline.exception.PipelineException;
+import org.nrg.pipeline.exception.PipelineEngineException;
 import org.nrg.pipeline.utils.CommandStatementPresenter;
 import org.nrg.pipeline.xmlbeans.ResolvedStepDocument.ResolvedStep.ResolvedResource;
 
@@ -41,7 +41,7 @@ public class OSInfo {
     }
       
     
-    public OS getOS(String host, String user, String password, String identity) throws PipelineException {
+    public OS getOS(String host, String user, String password, String identity) throws PipelineEngineException {
         OS rtn = null;
         if (OSTypes.containsKey(host)) {
             rtn = (OS)OSTypes.get(host);
@@ -52,11 +52,11 @@ public class OSInfo {
         return rtn;
     }
     
-    public  OS  getOS(ResolvedResource rsc) throws PipelineException{
+    public  OS  getOS(ResolvedResource rsc) throws PipelineEngineException{
         return getOS(rsc.getSsh2Host(), rsc.getSsh2User(), rsc.getSsh2Password(), rsc.getSsh2Identity());
     }
     
-    private  void setOS(String host, String user, String password, String identity) throws PipelineException{
+    private  void setOS(String host, String user, String password, String identity) throws PipelineEngineException{
         if (OSTypes.containsKey(host)) return;
         try {
             String unameOut = new RemoteLauncher().launchRemote(host,user,password,identity,new CommandStatementPresenter("uname -srp"));
@@ -67,7 +67,7 @@ public class OSInfo {
              remoteOS.setMachine(tokens[2]);
              OSTypes.put(host,remoteOS);
         }catch(Exception e) {
-            throw new PipelineException("Couldnt setOS info for " + host);
+            throw new PipelineEngineException("Couldnt setOS info for " + host);
         }
     }
 
