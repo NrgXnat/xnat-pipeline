@@ -139,10 +139,9 @@
 			</exclusions>
 		</dependency>
 		<dependency>
-			<!-- TODO: Upgrade to 1.2 or use Spring. -->
-			<groupId>commons-email</groupId>
+			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-email</artifactId>
-			<version>20030310.165926</version>
+			<version>1.2</version>
 		</dependency>
 		<dependency>
 			<!-- TODO: Upgrade to 0.1.44-1 -->
