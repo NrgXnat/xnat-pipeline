@@ -23,7 +23,12 @@ import java.util.Properties;
 public class PipelineProperties {
     
     private static boolean inited = false;
-    public static String PIPELINE_SMTP_HOST = "artsci.wustl.edu";
+    public static String PIPELINE_REST_MAIL_SVC = "http://localhost:8080/xnat/data/services/mail/send";
+    public static String PIPELINE_REST_MAIL_USER = "admin";
+    public static String PIPELINE_REST_MAIL_PASS = "admin";
+    public static String PIPELINE_SMTP_HOST = "mail.nrg.wustl.edu";
+    public static String PIPELINE_SMTP_USER = null;
+	public static String PIPELINE_SMTP_PASS = null;
     public static String PIPELINE_EMAIL_ID = "PipelineRunner@nrg.wustl.edu";
     public static String PIPELINE_ADMIN_EMAIL_ID = null;
     public static String PIPELINE_CATALOG_ROOT_PATH = null;
