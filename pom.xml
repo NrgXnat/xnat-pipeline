@@ -28,18 +28,15 @@
 		<!-- Include xdat_core dependency -->
 		<dependency>
 			<groupId>org.nrg.xdat</groupId>
-			<artifactId>xdat</artifactId>
-			<version>1.1-SNAPSHOT</version>
-			<exclusions>
-				<exclusion>
-					<artifactId>commons-lang</artifactId>
-					<groupId>commons-lang</groupId>
-				</exclusion>
-			</exclusions>
+			<artifactId>core</artifactId>
+			<version>1.6.0-SNAPSHOT</version>
+			</dependency>
+				<dependency>
+					<groupId>org.nrg</groupId>
+				<artifactId>mail</artifactId>
+			<version>1.0.0-SNAPSHOT</version>
 		</dependency>
 
-		<!-- XNAT dependencies: These are all system dependencies, convert to use 
-			Maven repo when available. -->
 		<dependency>
 			<groupId>org.nrg.xnat.pipeline</groupId>
 			<artifactId>xnat_tools</artifactId>
@@ -137,11 +134,6 @@
 					<groupId>commons-logging</groupId>
 				</exclusion>
 			</exclusions>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.commons</groupId>
-			<artifactId>commons-email</artifactId>
-			<version>1.2</version>
 		</dependency>
 		<dependency>
 			<!-- TODO: Upgrade to 0.1.44-1 -->

@@ -15,22 +15,25 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
-import org.apache.commons.mail.EmailAttachment;
-import org.apache.commons.mail.HtmlEmail;
 import org.apache.log4j.Logger;
+import org.nrg.mail.api.MailMessage;
 import org.nrg.pipeline.exception.PipelineEngineException;
 import org.nrg.pipeline.utils.AdminUtils;
 import org.nrg.pipeline.utils.CommandStatementPresenter;
+import org.nrg.pipeline.utils.MailUtils;
 import org.nrg.pipeline.utils.Notification;
 import org.nrg.pipeline.utils.PipelineProperties;
 import org.nrg.pipeline.utils.StringUtils;
 import org.nrg.pipeline.utils.XMLBeansUtils;
 import org.nrg.pipeline.xmlbeans.ArgumentData;
 import org.nrg.pipeline.xmlbeans.ParameterData;
-import org.nrg.pipeline.xmlbeans.ResourceData;
 import org.nrg.pipeline.xmlbeans.ResolvedStepDocument.ResolvedStep;
 import org.nrg.pipeline.xmlbeans.ResolvedStepDocument.ResolvedStep.ResolvedResource;
+import org.nrg.pipeline.xmlbeans.ResourceData;
 
 //////////////////////////////////////////////////////////////////////////
 //// ClassName
@@ -85,34 +88,34 @@ public class PersonnelNotificationLauncher implements LauncherI {
                 ArrayList bccArgs = XMLBeansUtils.getArgumentsById(rsc,"bcc");
                 ArgumentData subjectArg = XMLBeansUtils.getArgumentById(rsc,"subject");
                 ArgumentData bodyArg = XMLBeansUtils.getArgumentById(rsc,"body");
-                ArgumentData notifyAdmin = XMLBeansUtils.getArgumentById(rsc,"notifyAdmin");
+                ArgumentData notifyAdminArg = XMLBeansUtils.getArgumentById(rsc,"notifyAdmin");
                 ArrayList attachArgs = XMLBeansUtils.getArgumentsById(rsc,"attachment");
 
                 
                 //Create the email message
-                HtmlEmail email = new HtmlEmail();
-                if (hostArg == null)
-                    email.setHostName(PipelineProperties.PIPELINE_SMTP_HOST);
-                else
-                    email.setHostName(hostArg.getValue());
+                String from = fromArg.getValue();
+                List<String> tos = new ArrayList<String>();
                 for (int i = 0; i < toArgs.size(); i++) {
-                    email.addTo(((ArgumentData)toArgs.get(i)).getValue());
+                    tos.add(((ArgumentData)toArgs.get(i)).getValue());
                 }
-                email.setFrom(fromArg.getValue());
-                if (notifyAdmin!= null && notifyAdmin.getValue().equals("1") && ccArgs != null) {
+                boolean notifyAdmin = notifyAdminArg != null && notifyAdminArg.getValue().equals("1");
+                List<String> ccs = new ArrayList<String>();
+                if (ccArgs.size() > 0 || notifyAdmin) {
+                    ccs = new ArrayList<String>();
                     for (int i = 0; i < ccArgs.size(); i++) 
-                        email.addCc(((ArgumentData)ccArgs.get(i)).getValue());
-                }else if (notifyAdmin== null) {
-                    for (int i = 0; i < ccArgs.size(); i++) 
-                    	email.addCc(((ArgumentData)ccArgs.get(i)).getValue());
+                        ccs.add(((ArgumentData)ccArgs.get(i)).getValue());
+                    if (notifyAdmin) {
+                        ccs.add(PipelineProperties.PIPELINE_ADMIN_EMAIL_ID);
+                    }
                 }
+                List<String> bccs = new ArrayList<String>();
                 if (bccArgs != null) {
                     for (int i = 0; i < bccArgs.size(); i++) 
-                        email.addBcc(((ArgumentData)bccArgs.get(i)).getValue());
+                        bccs.add(((ArgumentData)bccArgs.get(i)).getValue());
                 }
                 
-                email.setSubject(subjectArg.getValue());
-               	String emailbody = "";
+                String subject = subjectArg.getValue();
+               	String html = "";
                 
                 if (bodyArg == null)  {
                 	if (bodycontents != null) {
@@ -122,52 +125,57 @@ public class PersonnelNotificationLauncher implements LauncherI {
                     	BufferedReader br = new BufferedReader(fr);
                       	String s;
                     	while((s = br.readLine()) != null) {
-                    		emailbody += s + "</br>";
+                    		html += s + "</br>";
                     	}
                     	br.close(); fr.close();
                 	}
                 }else {
-                	emailbody = bodyArg.getValue();
+                	html = bodyArg.getValue();
                 }
  
-                email.setHtmlMsg("<html>" + emailbody + "</html>");
                 //System.out.println("Email sent with html");
-                String txtMsg = org.apache.commons.lang.StringUtils.replace(emailbody,"<br>","\n");
-                txtMsg = org.apache.commons.lang.StringUtils.replace(txtMsg,"<br/>","\n");
-                txtMsg = org.apache.commons.lang.StringUtils.replace(txtMsg,"</br>","\n");
+                String text = org.apache.commons.lang.StringUtils.replace(html,"<br>","\n");
+                text = org.apache.commons.lang.StringUtils.replace(text,"<br/>","\n");
+                text = org.apache.commons.lang.StringUtils.replace(text,"</br>","\n");
                    
-                email.setTextMsg(txtMsg);
+                html = "<html>" + html + "</html>";
       
-                //email.setMsg(bodyArg.getValue());
+                Map<String, File> attachments = new HashMap<String, File>();
     
                 if (attachArgs != null && attachArgs.size() > 0) {
                     for (int i = 0; i < attachArgs.size(); i++) {
-                        //Create the attachment
-                        EmailAttachment attachment = new EmailAttachment();
-                        attachment.setPath(((ArgumentData)attachArgs.get(i)).getValue());
-                        attachment.setDisposition(EmailAttachment.ATTACHMENT);
-                        attachment.setDescription(((ArgumentData)attachArgs.get(i)).getDescription());
-                        attachment.setName(StringUtils.afterLastSlash(((ArgumentData)attachArgs.get(i)).getValue()));
-                        email.attach(attachment);
+                        String path = ((ArgumentData)attachArgs.get(i)).getValue();
+                        attachments.put(StringUtils.afterLastSlash(path), new File(path));
                     }
                 }
-                //send the email
-                email.send();
+
+                MailMessage message = new MailMessage();
+                message.setFrom(from);
+                message.setTos(tos);
+                message.setCcs(ccs);
+                message.setBccs(bccs);
+                message.setSubject(subject);
+                message.setHtml(html);
+                message.setText(text);
+                message.setAttachments(attachments);
+                MailUtils.send(message);
+
+                DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+                String time = dateFormat.format(Calendar.getInstance().getTime());
+
                 if (outputFileName != null) {
                     BufferedWriter out = new BufferedWriter(new FileWriter(outputFileName, true));
                     out.write("\n--------------------------------------------\n");
-                    DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
-                    out.write( dateFormat.format(Calendar.getInstance().getTime()) + "\n");
+                    out.write( time + "\n");
                     out.write("Email sent to " );
                     for (int i = 0; i < toArgs.size(); i++) 
                         out.write(((ArgumentData)toArgs.get(i)).getValue());
-                    out.write("  on " + email.getSentDate() + "\n");
                     out.write("Subject: " + subjectArg.getValue() + "\n");
-                    out.write("Body: " + emailbody);
+                    out.write("Body: " + html);
                     out.write("\n--------------------------------------------\n");
                     out.close();
                 }
-                notification.setCommand("Email sent to " + ((ArgumentData)toArgs.get(0)).getValue() + "  on " + email.getSentDate() + "  Subject:: " + subjectArg.getValue());
+                notification.setCommand("Email sent to " + ((ArgumentData)toArgs.get(0)).getValue() + "  at " + time + "  Subject: " + subjectArg.getValue());
             }
             notification.setStepTimeLaunched(AdminUtils.getTimeLaunched());
             return 0;
