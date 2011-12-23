@@ -1,39 +1,25 @@
-/* 
+/*
  *	Copyright Washington University in St Louis 2006
  *	All rights reserved
- * 	
+ *
  */
 
 package org.nrg.pipeline.process;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.apache.log4j.Logger;
 import org.nrg.mail.api.MailMessage;
 import org.nrg.pipeline.exception.PipelineEngineException;
-import org.nrg.pipeline.utils.AdminUtils;
-import org.nrg.pipeline.utils.CommandStatementPresenter;
-import org.nrg.pipeline.utils.MailUtils;
-import org.nrg.pipeline.utils.Notification;
-import org.nrg.pipeline.utils.PipelineProperties;
-import org.nrg.pipeline.utils.StringUtils;
-import org.nrg.pipeline.utils.XMLBeansUtils;
+import org.nrg.pipeline.utils.*;
 import org.nrg.pipeline.xmlbeans.ArgumentData;
 import org.nrg.pipeline.xmlbeans.ParameterData;
 import org.nrg.pipeline.xmlbeans.ResolvedStepDocument.ResolvedStep;
 import org.nrg.pipeline.xmlbeans.ResolvedStepDocument.ResolvedStep.ResolvedResource;
 import org.nrg.pipeline.xmlbeans.ResourceData;
+
+import java.io.*;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 //////////////////////////////////////////////////////////////////////////
 //// ClassName
@@ -72,18 +58,17 @@ public class PersonnelNotificationLauncher implements LauncherI {
                 	String s;
                 	while((s = br.readLine()) != null) {
 	                	String ids[] = s.split(",");
-	                	for (int j=0;j<ids.length;j++) {
-	                		ArgumentData toId = ArgumentData.Factory.newInstance();
-	                		toId.setName("to"); toId.setValue(ids[j]);
-	                		toArgs.add(toId);
-	                		
-	                	}
-	                	}
+                        for (String id : ids) {
+                            ArgumentData toId = ArgumentData.Factory.newInstance();
+                            toId.setName("to");
+                            toId.setValue(id);
+                            toArgs.add(toId);
+                        }
+	                }
                 	br.close();
-                	fr.close(); 
+                	fr.close();
                 }
                 ArgumentData fromArg = XMLBeansUtils.getArgumentById(rsc,"from");
-                ArgumentData hostArg = XMLBeansUtils.getArgumentById(rsc,"host");
                 ArrayList ccArgs =  XMLBeansUtils.getArgumentsById(rsc,"cc");
                 ArrayList bccArgs = XMLBeansUtils.getArgumentsById(rsc,"bcc");
                 ArgumentData subjectArg = XMLBeansUtils.getArgumentById(rsc,"subject");
@@ -91,32 +76,35 @@ public class PersonnelNotificationLauncher implements LauncherI {
                 ArgumentData notifyAdminArg = XMLBeansUtils.getArgumentById(rsc,"notifyAdmin");
                 ArrayList attachArgs = XMLBeansUtils.getArgumentsById(rsc,"attachment");
 
-                
+
                 //Create the email message
                 String from = fromArg.getValue();
+
                 List<String> tos = new ArrayList<String>();
-                for (int i = 0; i < toArgs.size(); i++) {
-                    tos.add(((ArgumentData)toArgs.get(i)).getValue());
+                for (Object toArg : toArgs) {
+                    tos.add(((ArgumentData) toArg).getValue());
                 }
-                boolean notifyAdmin = notifyAdminArg != null && notifyAdminArg.getValue().equals("1");
+
                 List<String> ccs = new ArrayList<String>();
-                if (ccArgs.size() > 0 || notifyAdmin) {
-                    ccs = new ArrayList<String>();
-                    for (int i = 0; i < ccArgs.size(); i++) 
-                        ccs.add(((ArgumentData)ccArgs.get(i)).getValue());
-                    if (notifyAdmin) {
-                        ccs.add(PipelineProperties.PIPELINE_ADMIN_EMAIL_ID);
+                if (ccArgs != null) {
+                    for (Object ccArg : ccArgs) {
+                        ccs.add(((ArgumentData) ccArg).getValue());
                     }
                 }
+                if (notifyAdminArg != null && notifyAdminArg.getValue().equals("1")) {
+                    ccs.add(PipelineProperties.getPipelineAdminEmail());
+                }
+
                 List<String> bccs = new ArrayList<String>();
                 if (bccArgs != null) {
-                    for (int i = 0; i < bccArgs.size(); i++) 
-                        bccs.add(((ArgumentData)bccArgs.get(i)).getValue());
+                    for (Object bccArg : bccArgs) {
+                        bccs.add(((ArgumentData) bccArg).getValue());
+                    }
                 }
-                
+
                 String subject = subjectArg.getValue();
                	String html = "";
-                
+
                 if (bodyArg == null)  {
                 	if (bodycontents != null) {
                        	File bodyFile = new File(bodycontents.getValue());
@@ -132,19 +120,19 @@ public class PersonnelNotificationLauncher implements LauncherI {
                 }else {
                 	html = bodyArg.getValue();
                 }
- 
+
                 //System.out.println("Email sent with html");
                 String text = org.apache.commons.lang.StringUtils.replace(html,"<br>","\n");
                 text = org.apache.commons.lang.StringUtils.replace(text,"<br/>","\n");
                 text = org.apache.commons.lang.StringUtils.replace(text,"</br>","\n");
-                   
+
                 html = "<html>" + html + "</html>";
-      
+
                 Map<String, File> attachments = new HashMap<String, File>();
-    
+
                 if (attachArgs != null && attachArgs.size() > 0) {
-                    for (int i = 0; i < attachArgs.size(); i++) {
-                        String path = ((ArgumentData)attachArgs.get(i)).getValue();
+                    for (Object attachArg : attachArgs) {
+                        String path = ((ArgumentData) attachArg).getValue();
                         attachments.put(StringUtils.afterLastSlash(path), new File(path));
                     }
                 }
@@ -168,14 +156,15 @@ public class PersonnelNotificationLauncher implements LauncherI {
                     out.write("\n--------------------------------------------\n");
                     out.write( time + "\n");
                     out.write("Email sent to " );
-                    for (int i = 0; i < toArgs.size(); i++) 
-                        out.write(((ArgumentData)toArgs.get(i)).getValue());
+                    for (Object toArg : toArgs) {
+                        out.write(((ArgumentData) toArg).getValue());
+                    }
                     out.write("Subject: " + subjectArg.getValue() + "\n");
                     out.write("Body: " + html);
                     out.write("\n--------------------------------------------\n");
                     out.close();
                 }
-                notification.setCommand("Email sent to " + ((ArgumentData)toArgs.get(0)).getValue() + "  at " + time + "  Subject: " + subjectArg.getValue());
+                notification.setCommand("Email sent to " + ((ArgumentData) toArgs.get(0)).getValue() + "  at " + time + "  Subject: " + subjectArg.getValue());
             }
             notification.setStepTimeLaunched(AdminUtils.getTimeLaunched());
             return 0;
@@ -190,34 +179,34 @@ public class PersonnelNotificationLauncher implements LauncherI {
                     out.write("\n--------------------------------------------\n");
                     out.close();
                 }
-            }catch(Exception e1){}
+            } catch(Exception ignored) {}
             throw new PipelineEngineException("Personnel notification email couldnt be sent " + e.getClass() + e.getLocalizedMessage(),e);
         }
-        
+
     }
 
-    
-    
+
+
     public void setErrorFileName(String errorFileName) {
         this.errorFileName = errorFileName;
     }
-    
+
     public void setOutputFileName(String outputFileName) {
         this.outputFileName = outputFileName;
     }
-    
+
     public Notification getNotification() {
         return notification;
     }
 
     public void setDebug(boolean debugMode) {
-        debug = debugMode;    
+        debug = debugMode;
        }
-    
+
     Notification notification = null;
     boolean debug;
     String errorFileName = null, outputFileName = null;
-    
+
     static Logger logger = Logger.getLogger(PersonnelNotificationLauncher.class);
-    
+
 }

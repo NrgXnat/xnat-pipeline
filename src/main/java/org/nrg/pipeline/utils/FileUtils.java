@@ -1,7 +1,7 @@
-/* 
+/*
  *	Copyright Washington University in St Louis 2006
  *	All rights reserved
- * 	
+ *
  */
 
 package org.nrg.pipeline.utils;
@@ -46,24 +46,24 @@ public class FileUtils {
 								arg.setValue("******");
 							}
 						}
-					}	
+					}
 				}
 			}
 		}
 	}
-	
+
     public static void saveFile(File file, AllResolvedStepsDocument allResolvedStepsDocument) throws IOException {
         if (allResolvedStepsDocument != null) {
             ParameterUtils.maskPwdParameter(allResolvedStepsDocument);
-            
+
             String savedFile = file.getAbsolutePath();
             try {
                 allResolvedStepsDocument.save(file,new XmlOptions().setSavePrettyPrint().setSaveAggressiveNamespaces());
             }catch(Exception e) {
                 ParameterData builddir = XMLBeansUtils.getParameterByName(allResolvedStepsDocument,"builddir");
                 if (builddir != null) {
-                   //System.out.println("buildir " + builddir.xmlText()); 
-                   if (savedFile.startsWith(builddir.getValues().getUnique())) { 
+                   //System.out.println("buildir " + builddir.xmlText());
+                   if (savedFile.startsWith(builddir.getValues().getUnique())) {
                        ParameterData archivedir = XMLBeansUtils.getParameterByName(allResolvedStepsDocument,"archivedir");
                        if (archivedir != null) {
                            savedFile = StringUtils.replace(savedFile,builddir.getValues().getUnique(),archivedir.getValues().getUnique());
@@ -77,16 +77,16 @@ public class FileUtils {
             }
         }
     }
-    
-    
+
+
 
     public static String getAbsolutePath(String location, String name) {
         String absolutePath = location;
         boolean isAbsolute = IsAbsolutePath(location);
         if (!isAbsolute) {
-        	absolutePath = PipelineProperties.PIPELINE_CATALOG_ROOT_PATH + location;
+        	absolutePath = PipelineProperties.getPipelineCatalogRootPath() + location;
         }
-        if (!absolutePath.endsWith("/") && !absolutePath.endsWith(File.separator)) 
+        if (!absolutePath.endsWith("/") && !absolutePath.endsWith(File.separator))
         	absolutePath += File.separator;
         if (name != null) {
 	        if (!name.endsWith(".xml")) name += ".xml";
@@ -94,20 +94,20 @@ public class FileUtils {
         }
         return absolutePath;
     }
-    
+
     public static String getAbsolutePath(String location, boolean appendSepChar) {
         String absolutePath = location;
         boolean isAbsolute = IsAbsolutePath(location);
         if (!isAbsolute) {
-        	absolutePath = PipelineProperties.PIPELINE_CATALOG_ROOT_PATH + location;
+        	absolutePath = PipelineProperties.getPipelineCatalogRootPath() + location;
         }
         if (appendSepChar) {
-	        if (!absolutePath.endsWith("/") && !absolutePath.endsWith(File.separator)) 
+	        if (!absolutePath.endsWith("/") && !absolutePath.endsWith(File.separator))
 	        	absolutePath += File.separator;
         }
         return absolutePath;
     }
-    
+
 	public static boolean IsAbsolutePath(String path)	{
         if (path.startsWith("file:") || path.startsWith("http:") || path.startsWith("srb:"))    {
             return true;
@@ -125,7 +125,7 @@ public class FileUtils {
         }
        return false;
 	}
-    
+
     public static boolean touchDir(String fileName) {
         boolean exists = false;
         if (fileName.startsWith("EXISTS"))
@@ -138,7 +138,7 @@ public class FileUtils {
             exists = new File(path).mkdirs();
         return exists;
     }
-    
+
     public static String getDirectory(String path) {
         String rtn = path;
         int lastLocation = path.lastIndexOf(File.separator);
@@ -146,7 +146,7 @@ public class FileUtils {
         rtn = path.substring(0, lastLocation);
         return rtn;
     }
-    
+
     public static boolean fileExists(String condition) {
         boolean rtn = false;
         if (condition == null) return true;
@@ -157,7 +157,7 @@ public class FileUtils {
         }
         return rtn;
     }
-    
+
     public static String getFileSeparatorChar(ResolvedResource rsc)  {
         String rtn = File.separator;
         try {
@@ -171,6 +171,6 @@ public class FileUtils {
         }catch(Exception pe) {}
         return rtn;
     }
-    
- 
+
+
 }
