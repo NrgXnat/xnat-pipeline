@@ -1,7 +1,7 @@
-/* 
+/*
  *	Copyright Washington University in St Louis 2006
  *	All rights reserved
- * 	
+ *
  */
 
 package org.nrg.pipeline.utils;
@@ -16,19 +16,15 @@ package org.nrg.pipeline.utils;
  @since Pipeline 1.0
  */
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.mail.MessagingException;
-
 import org.apache.commons.mail.EmailException;
 import org.apache.commons.mail.HtmlEmail;
 import org.nrg.mail.api.MailMessage;
 import org.nrg.mail.services.MailService;
 import org.nrg.mail.services.impl.RestBasedMailServiceImpl;
+
+import javax.mail.MessagingException;
+import java.io.File;
+import java.util.*;
 
 public class MailUtils {
 
@@ -38,7 +34,7 @@ public class MailUtils {
             for (int i = 0; i < emailIds.size(); i++)
                 tos.add((String) emailIds.get(i));
 
-            String from = PipelineProperties.PIPELINE_EMAIL_ID;
+            String from = PipelineProperties.getPipelineEmail();
             String html = "<html>" + body + "</html>";
             String text = org.apache.commons.lang.StringUtils.replace(body, "<br>", "\n");
 
@@ -70,30 +66,36 @@ public class MailUtils {
 		} catch (MessagingException exception) {
             System.out.println("Message failed to send through REST service, retrying with direct SMTP.");
             HtmlEmail email = message.asHtmlEmail();
-            email.setHostName(PipelineProperties.PIPELINE_SMTP_HOST);
-            if (!org.apache.commons.lang.StringUtils.isBlank(PipelineProperties.PIPELINE_SMTP_USER) &&
-            	!org.apache.commons.lang.StringUtils.isBlank(PipelineProperties.PIPELINE_SMTP_USER)) {
-            		email.setAuthentication(PipelineProperties.PIPELINE_SMTP_USER, PipelineProperties.PIPELINE_SMTP_PASS);
+            email.setHostName(PipelineProperties.getPipelineSmtpHost());
+            if (!org.apache.commons.lang.StringUtils.isBlank(PipelineProperties.getPipelineSmtpUser()) &&
+            	!org.apache.commons.lang.StringUtils.isBlank(PipelineProperties.getPipelineSmtpUser())) {
+            		email.setAuthentication(PipelineProperties.getPipelineSmtpUser(), PipelineProperties.getPipelineSmtpPass());
             }
             email.send();
             System.out.println("Message sent OK.");
 		}
 	}
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
+        if (args.length < 2) {
+            throw new RuntimeException("You must specify the location of the properties file and at least one email address to which to send a test email.");
+        }
+        PipelineProperties.init(args[0]);
         List<String> emails = new ArrayList<String>();
-        emails.add("mohanar@npg.wustl.edu");
+        for (int index = 1; index < args.length; index++) {
+            emails.add(args[index]);
+        }
         try {
             MailUtils.send("Test", "Hello there", emails, null, null);
         } catch (Exception e) {
-        	
+
         }
     }
 
     // TODO: Optimally, the _service field would be populated by dependency injection, e.g. Spring or Turbine.
     private static MailService getMailService() {
     	if (_service == null) {
-			_service = new RestBasedMailServiceImpl(PipelineProperties.PIPELINE_REST_MAIL_SVC, PipelineProperties.PIPELINE_REST_MAIL_USER, PipelineProperties.PIPELINE_REST_MAIL_PASS);
+			_service = new RestBasedMailServiceImpl(PipelineProperties.getPipelineRestMailService(), PipelineProperties.getPipelineRestMailUser(), PipelineProperties.getPipelineRestMailPassword());
     	}
     	return _service;
     }
