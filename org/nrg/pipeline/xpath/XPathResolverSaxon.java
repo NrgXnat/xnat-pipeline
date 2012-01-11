@@ -89,7 +89,7 @@ public class XPathResolverSaxon {
         }else {
             rtn.add(expression);
         }
-        //logger.debug("Expre " + expression + " " + rtn);
+        logger.debug("Expre " + expression + " " + rtn);
         return rtn;
     }
     

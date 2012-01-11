@@ -30,6 +30,21 @@ import org.nrg.pipeline.xmlbeans.ResolvedStepDocument.ResolvedStep.ResolvedResou
 
 public class FileUtils {
 
+	 public static String filenameToURL(String filename)
+	  {
+	    File f = new File(filename);
+	    String tmp = f.getAbsolutePath();
+	    if (File.separatorChar == '\\')
+	    {
+	      tmp = tmp.replace('\\', '/');
+	    }
+	    // Note: gives incorrect results when filename already begins with file:///
+	    if (!tmp.startsWith("file:///"))
+	    	return "file:///" + tmp;
+	    else 
+	    	return tmp;
+	  }
+	
 	private static void maskSensitiveArguments(AllResolvedStepsDocument allResolvedStepsDocument) {
 		if (allResolvedStepsDocument != null) {
 			ResolvedStep[] resolvedSteps = allResolvedStepsDocument.getAllResolvedSteps().getResolvedStepArray();
