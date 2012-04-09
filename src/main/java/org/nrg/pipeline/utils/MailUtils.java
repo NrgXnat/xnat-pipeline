@@ -16,8 +16,11 @@ package org.nrg.pipeline.utils;
  @since Pipeline 1.0
  */
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.commons.mail.EmailException;
 import org.apache.commons.mail.HtmlEmail;
+import org.nrg.framework.exceptions.NrgServiceException;
 import org.nrg.mail.api.MailMessage;
 import org.nrg.mail.services.MailService;
 import org.nrg.mail.services.impl.RestBasedMailServiceImpl;
@@ -95,10 +98,15 @@ public class MailUtils {
     // TODO: Optimally, the _service field would be populated by dependency injection, e.g. Spring or Turbine.
     private static MailService getMailService() {
     	if (_service == null) {
-			_service = new RestBasedMailServiceImpl(PipelineProperties.getPipelineRestMailService(), PipelineProperties.getPipelineRestMailUser(), PipelineProperties.getPipelineRestMailPassword());
-    	}
+            try {
+                _service = new RestBasedMailServiceImpl(PipelineProperties.getPipelineRestMailService(), PipelineProperties.getPipelineRestMailUser(), PipelineProperties.getPipelineRestMailPassword());
+            } catch (NrgServiceException exception) {
+                _log.error("Error creating the mail service", exception);
+            }
+        }
     	return _service;
     }
 
+    private static final Log _log = LogFactory.getLog(MailUtils.class);
     private static MailService _service;
 }
