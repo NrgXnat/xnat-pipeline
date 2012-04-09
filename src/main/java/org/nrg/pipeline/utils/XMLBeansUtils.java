@@ -6,18 +6,6 @@
 
 package org.nrg.pipeline.utils;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Hashtable;
-import java.util.Iterator;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-
 import org.apache.log4j.Logger;
 import org.apache.xmlbeans.XmlCursor;
 import org.apache.xmlbeans.XmlException;
@@ -25,21 +13,23 @@ import org.apache.xmlbeans.XmlObject;
 import org.apache.xmlbeans.XmlOptions;
 import org.nrg.pipeline.constants.PipelineConstants;
 import org.nrg.pipeline.exception.PipelineEngineException;
-import org.nrg.pipeline.xmlbeans.AllResolvedStepsDocument;
-import org.nrg.pipeline.xmlbeans.ArgumentData;
-import org.nrg.pipeline.xmlbeans.Loop;
-import org.nrg.pipeline.xmlbeans.ParameterData;
-import org.nrg.pipeline.xmlbeans.PipelineData;
-import org.nrg.pipeline.xmlbeans.PipelineData.Steps.Step;
-import org.nrg.pipeline.xmlbeans.ResolvedStepDocument;
-import org.nrg.pipeline.xmlbeans.ResourceData;
+import org.nrg.pipeline.xmlbeans.*;
 import org.nrg.pipeline.xmlbeans.ParametersDocument.Parameters;
 import org.nrg.pipeline.xmlbeans.PipelineData.Steps;
+import org.nrg.pipeline.xmlbeans.PipelineData.Steps.Step;
 import org.nrg.pipeline.xmlbeans.ResolvedStepDocument.ResolvedStep;
 import org.nrg.pipeline.xmlbeans.ResourceData.Input.Argument;
 import org.nrg.pipeline.xpath.XPathResolverSaxon;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.*;
 
 //////////////////////////////////////////////////////////////////////////
 ////ClassName XMLBeanUtils
@@ -195,13 +185,15 @@ public class XMLBeansUtils {
        return rtn;
    }
    
-   public static ArrayList getArgumentsById (ResourceData resourceData, String idToMatch) {
-       ArrayList rtn = null;
+   public static List<ArgumentData> getArgumentsById (ResourceData resourceData, String idToMatch) {
+       List<ArgumentData> rtn = null;
        Argument[] arguments =  resourceData.getInput().getArgumentArray();
-       for (int i = 0; i < arguments.length; i++) {
-           if (arguments[i].getId().equals(idToMatch)) {
-               if (rtn == null) rtn = new ArrayList();
-               rtn.add(arguments[i]);
+       for (final Argument argument : arguments) {
+           if (argument.getId().equals(idToMatch)) {
+               if (rtn == null) {
+                   rtn = new ArrayList<ArgumentData>();
+               }
+               rtn.add(argument);
            }
        }
        return rtn;

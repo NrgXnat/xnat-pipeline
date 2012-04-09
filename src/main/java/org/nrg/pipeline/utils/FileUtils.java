@@ -99,7 +99,7 @@ public class FileUtils {
         String absolutePath = location;
         boolean isAbsolute = IsAbsolutePath(location);
         if (!isAbsolute) {
-        	absolutePath = PipelineProperties.PIPELINE_CATALOG_ROOT_PATH + location;
+        	absolutePath = PipelineProperties.getPipelineCatalogRootPath() + location;
         }
         if (!absolutePath.endsWith("/") && !absolutePath.endsWith(File.separator)) 
         	absolutePath += File.separator;
@@ -114,7 +114,7 @@ public class FileUtils {
         String absolutePath = location;
         boolean isAbsolute = IsAbsolutePath(location);
         if (!isAbsolute) {
-        	absolutePath = PipelineProperties.PIPELINE_CATALOG_ROOT_PATH + location;
+        	absolutePath = PipelineProperties.getPipelineCatalogRootPath() + location;
         }
         if (appendSepChar) {
 	        if (!absolutePath.endsWith("/") && !absolutePath.endsWith(File.separator)) 
