@@ -69,6 +69,8 @@ public class PersonnelNotificationLauncher implements LauncherI {
                 	fr.close(); 
                 }
 
+                ArgumentData usernameArg = XMLBeansUtils.getArgumentById(rsc,"user");
+                ArgumentData passwordArg = XMLBeansUtils.getArgumentById(rsc,"password");
                 ArgumentData fromArg = XMLBeansUtils.getArgumentById(rsc,"from");
                 List<ArgumentData> ccArgs =  XMLBeansUtils.getArgumentsById(rsc,"cc");
                 List<ArgumentData> bccArgs = XMLBeansUtils.getArgumentsById(rsc,"bcc");
@@ -76,6 +78,9 @@ public class PersonnelNotificationLauncher implements LauncherI {
                 ArgumentData bodyArg = XMLBeansUtils.getArgumentById(rsc,"body");
                 ArgumentData notifyAdminArg = XMLBeansUtils.getArgumentById(rsc,"notifyAdmin");
                 List<ArgumentData> attachArgs = XMLBeansUtils.getArgumentsById(rsc, "attachment");
+
+                String username = usernameArg.getValue();
+                String password = passwordArg.getValue();
 
                 //Create the email message
                 String from = fromArg.getValue();
@@ -146,7 +151,7 @@ public class PersonnelNotificationLauncher implements LauncherI {
                 message.setHtml(html);
                 message.setText(text);
                 message.setAttachments(attachments);
-                MailUtils.send(message);
+                MailUtils.send(message, username, password);
 
                 DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
                 String time = dateFormat.format(Calendar.getInstance().getTime());
