@@ -5,13 +5,13 @@
 	<parent>
 		<groupId>org.nrg</groupId>
 		<artifactId>nrg</artifactId>
-		<version>1.0.0-SNAPSHOT</version>
+		<version>1.6</version>
 		<relativePath>../nrg/pom.xml</relativePath>
 	</parent>
 
 	<groupId>org.nrg.xnat.pipeline</groupId>
 	<artifactId>xnat_pipeline</artifactId>
-	<version>1.0.0-SNAPSHOT</version>
+
 	<name>XNAT Pipeline</name>
 
 	<url>https://bitbucket.org/nrg/xnat_pipeline/</url>
@@ -200,8 +200,6 @@
 
 		<!-- TODO: Standardize output naming to Maven defaults to allow version 
 			info in filename. -->
-		<finalName>Pipeline</finalName>
-
 		<plugins>
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
@@ -226,6 +224,35 @@
 					<target>1.6</target>
 				</configuration>
 			</plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>2.1.2</version>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>2.8</version>
+                <executions>
+                    <execution>
+                        <id>attach-javadocs</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <quiet>true</quiet>
+                </configuration>
+            </plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>

@@ -10,7 +10,9 @@
       <sourceFolder url="file://$MODULE_DIR$/src/test/resources" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/target/generated-sources/test-annotations" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/target/generated-sources/annotations" isTestSource="false" />
+      <excludeFolder url="file://$MODULE_DIR$/target/apidocs" />
       <excludeFolder url="file://$MODULE_DIR$/target/classes" />
+      <excludeFolder url="file://$MODULE_DIR$/target/javadoc-bundle-options" />
       <excludeFolder url="file://$MODULE_DIR$/target/maven-archiver" />
       <excludeFolder url="file://$MODULE_DIR$/target/surefire" />
       <excludeFolder url="file://$MODULE_DIR$/target/surefire-reports" />
@@ -18,11 +20,9 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" name="Maven: net.sf.saxon:saxon-dom:8.7" level="project" />
-    <orderEntry type="library" name="Maven: axis:axis-saaj:1.2" level="project" />
-    <orderEntry type="module" module-name="core" />
+    <orderEntry type="library" name="Maven: org.nrg.xdat:core:1.6.0-SNAPSHOT" level="project" />
     <orderEntry type="module" module-name="notify" />
-    <orderEntry type="module" module-name="mail" />
+    <orderEntry type="library" name="Maven: org.nrg:mail:1.0.0-SNAPSHOT" level="project" />
     <orderEntry type="module" module-name="framework" />
     <orderEntry type="library" name="Maven: org.springframework:spring-orm:3.0.5.RELEASE" level="project" />
     <orderEntry type="library" name="Maven: org.springframework:spring-beans:3.0.5.RELEASE" level="project" />
@@ -45,6 +45,7 @@
     <orderEntry type="library" name="Maven: org.slf4j:slf4j-api:1.6.4" level="project" />
     <orderEntry type="library" name="Maven: org.hibernate.javax.persistence:hibernate-jpa-2.0-api:1.0.1.Final" level="project" />
     <orderEntry type="library" name="Maven: javax.transaction:jta:1.1" level="project" />
+    <orderEntry type="library" name="Maven: commons-io:commons-io:2.3" level="project" />
     <orderEntry type="library" name="Maven: commons-lang:commons-lang:2.5" level="project" />
     <orderEntry type="library" name="Maven: commons-httpclient:commons-httpclient:3.1" level="project" />
     <orderEntry type="library" name="Maven: log4j:log4j:1.2.16" level="project" />
@@ -97,16 +98,13 @@
     <orderEntry type="library" name="Maven: org.dspace:jargon:1.4.25" level="project" />
     <orderEntry type="library" name="Maven: org.nrg.xnat:xnatsrb:1.0" level="project" />
     <orderEntry type="library" name="Maven: org.json:json:20090211" level="project" />
-    <orderEntry type="library" name="Maven: commons-io:commons-io:2.3" level="project" />
     <orderEntry type="library" name="Maven: commons-dbcp:commons-dbcp:1.4" level="project" />
     <orderEntry type="library" name="Maven: commons-pool:commons-pool:1.5.4" level="project" />
     <orderEntry type="library" name="Maven: nl.bitwalker:UserAgentUtils:1.2.4" level="project" />
     <orderEntry type="library" name="Maven: ant:ant:1.6.1" level="project" />
-    <orderEntry type="module" module-name="xnat_tools" />
+    <orderEntry type="library" name="Maven: org.nrg.xnat.pipeline:xnat_tools:1.0.0-SNAPSHOT" level="project" />
     <orderEntry type="library" name="Maven: org.nrg:pipelineXNAT:1.0" level="project" />
     <orderEntry type="library" name="Maven: org.nrg.xdat:beans:1.0" level="project" />
-    <orderEntry type="library" name="Maven: org.apache.httpcomponents:httpclient:4.1.3" level="project" />
-    <orderEntry type="library" name="Maven: org.apache.httpcomponents:httpcore:4.1.4" level="project" />
     <orderEntry type="library" name="Maven: org.apache.xmlbeans:xmlbeans:2.2.0" level="project" />
     <orderEntry type="library" name="Maven: stax:stax-api:1.0.1" level="project" />
     <orderEntry type="library" name="Maven: com.noelios.restlet:com.noelios.restlet:1.1.10" level="project" />
