@@ -30,8 +30,9 @@ import java.util.*;
 
 public class MailUtils {
 
-	public static void send(String subject, String body, List<String> emailIds, String outfilepath, String errorfilepath) throws EmailException {
-        if (emailIds != null && emailIds.size() > 0) {
+	private static MailMessage getMailMessage(String subject, String body, List<String> emailIds, String outfilepath, String errorfilepath) throws EmailException {
+		MailMessage message = null;
+		if (emailIds != null && emailIds.size() > 0) {
             _log.debug("Sending message with subject: " + subject);
             List<String> tos = new ArrayList<String>(emailIds);
 
@@ -48,18 +49,31 @@ public class MailUtils {
                 attachments.put(StringUtils.afterLastSlash(errorfilepath), new File(errorfilepath));
             }
 
-            MailMessage message = new MailMessage();
+            message = new MailMessage();
             message.setFrom(from);
             message.setTos(tos);
             message.setSubject(subject);
             message.setHtml(html);
             message.setText(text);
             message.setAttachments(attachments);
-
-            MailUtils.send(message);
+            
         }
+		return message;
+	}
+	
+	public static void send(String subject, String body, List<String> emailIds, String outfilepath, String errorfilepath) throws EmailException {
+		MailMessage message = getMailMessage(subject, body, emailIds, outfilepath, errorfilepath);
+		if (message != null)
+			MailUtils.send(message);
+	}
+
+	public static void send(String subject, String body, List<String> emailIds, String outfilepath, String errorfilepath, String username, String password) throws EmailException {
+		MailMessage message = getMailMessage(subject, body, emailIds, outfilepath, errorfilepath);
+		if (message != null)
+			MailUtils.send(message, username, password);
     }
 
+	
 	public static void send(MailMessage message) throws EmailException {
 		try {
 			getMailService().sendMessage(message);
