@@ -192,7 +192,10 @@ public class ParameterUtils {
                     for (int k = 0; k < xparamValues.size(); k++) {
                         resolvedValues.addList((String)xparamValues.get(k));
                     }
-                }else throw new PipelineEngineException("Couldnt resolve xpath expression " + aValues.getListArray(i));                
+                }else if (xparamValues != null && xparamValues.size() == 0) {
+                	System.out.println("ParameterUtils:: Looks like the parameter " + aParam.getName() + " doesnt resolve to any values");
+                }
+                else throw new PipelineEngineException("Couldnt resolve xpath expression " + aValues.getListArray(i));                
             }
         }
     }
