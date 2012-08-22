@@ -314,8 +314,9 @@ public class XPathResolverSaxon {
     public static void main(String args[]) {
         try {
             BasicConfigurator.configure();
-            XmlObject xmlObject = new XmlReader().read("C:\\data\\build\\CNTRACS_UCD_QC\\20110425_220901\\archive_trigger\\Pat\\Pat_params_20110425220906.xml");
-            ArrayList resolvedValues = XPathResolverSaxon.GetInstance().resolveXPathExpressions("count(/Pipeline/parameters/parameter[name='bold']/values/list)",xmlObject);
+            XmlObject xmlObject = new XmlReader().read("C:\\Junk\\test_param.xml");
+            String stmt ="if (count(/Pipeline/parameters/parameter[name='diffusion_scan_type']/values/unique) > 0) then 1 else if ( count(/Pipeline/parameters/parameter[name='diffusion_scan_type']/values/list)>1) then count(/Pipeline/parameters/parameter[name='diffusion_scan_type']/values/list) else 0";
+            ArrayList resolvedValues = XPathResolverSaxon.GetInstance().resolveXPathExpressions(stmt,xmlObject);
             //ArrayList resolvedValues = XPathResolverSaxon.GetInstance().resolveXPathExpressions("nrgString:afterLastIndexofOrStr(/p:Parameters/p:parameter[p:name='target']/p:values/p:unique/text(),\"/\")",xmlObject);
             //ArrayList resolvedValues = XPathResolverSaxon.GetInstance().resolveXPathExpressions("nrgString:afterLastSlash(/Parameters/parameter[name='target']/values/unique/text())",xmlObject);
             System.out.println("ResolvedValues = " + resolvedValues.get(0));
