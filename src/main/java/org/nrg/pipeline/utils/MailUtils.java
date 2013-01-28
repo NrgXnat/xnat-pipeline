@@ -115,7 +115,22 @@ public class MailUtils {
         PipelineProperties.init(args[0]);
         List<String> emails = new ArrayList<String>(Arrays.asList(args).subList(1, args.length));
         try {
-            MailUtils.send("Test", "Hello there", emails, null, null);
+            List<String> tos = new ArrayList<String>();
+            tos.add("EMAIL_HERE");
+            Map<String, File> attachments = new HashMap<String, File>();
+            attachments.put("pipeline.config", new File(args[0]));
+
+            MailMessage message = new MailMessage();
+            message.setFrom("EMAIL_HERE");
+            message.setTos(tos);
+            message.setSubject("Test attachment");
+            message.setHtml("HTML Test Attachment");
+            message.setText("TEXT Test Attachment");
+            
+            message.setAttachments(attachments);
+            MailUtils.send(message, "USER", "PASSWORD");
+            System.out.println("MESSAGE SENT");
+            MailUtils.send("Test", "Hello there", emails, null, null,"USER","PASSWORD");
         } catch (Exception exception) {
             _log.error("Message failed to send through REST service, retrying with direct SMTP.", exception);
         }

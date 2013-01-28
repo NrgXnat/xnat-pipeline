@@ -153,8 +153,13 @@ public class ProvenanceUtils {
         }else if (!inStr.toLowerCase().startsWith("usage")){
             //Return only first three lines 
             String[] lines = inStr.split("\n");
-            if (lines != null && lines.length > 3) {
-                rtn = lines[0] +" " + lines[1] + " " + lines[2];
+            if (lines != null ) {
+               if (lines.length > 3)  rtn = lines[0] +" " + lines[1] + " " + lines[2];
+               else {
+            	   for (int i=0;i<lines.length;i++) {
+            		   rtn += lines[i] + " ";
+            	   }
+               }
             }
         }
         rtn = StringUtils.replace(rtn,"\n"," ");
@@ -180,7 +185,7 @@ public class ProvenanceUtils {
         try {
             LocalProcessLauncher launcher = new LocalProcessLauncher(null,null);
             launcher.launchProcess(command,null, timeOut);
-            if (launcher.getStreamErrOutput() != null)
+            if (launcher.getStreamOutput() != null)
                rtn = launcher.getStreamOutput();
             if (rtn == null && launcher.getStreamErrOutput() != null)
                rtn = launcher.getStreamErrOutput();
