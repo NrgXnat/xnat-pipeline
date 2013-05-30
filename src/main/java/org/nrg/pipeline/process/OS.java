@@ -21,7 +21,7 @@ public class OS {
     String platform;
     String platform_version;
     String machine;
-    String fileSeparatorChar;
+    String fileSeparatorChar ="/";
     boolean isUnix;
     
     /**
