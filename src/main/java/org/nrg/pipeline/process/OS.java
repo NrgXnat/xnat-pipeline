@@ -22,7 +22,7 @@ public class OS {
     String platform_version;
     String machine;
     String fileSeparatorChar ="/";
-    boolean isUnix;
+    boolean isUnix = true;
     
     /**
      * @return Returns the fileSeparatorChar.
