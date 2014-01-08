@@ -42,6 +42,9 @@ public class PersonnelNotificationLauncher implements LauncherI {
         }
         try {
             if (!debug) {
+                List<ArgumentData> toSplitArgs = new ArrayList<ArgumentData>();
+                List<ArgumentData> ccSplitArgs = new ArrayList<ArgumentData>();
+
                 List<ArgumentData> toArgs = XMLBeansUtils.getArgumentsById(rsc,"to");
                 ArgumentData tolist = XMLBeansUtils.getArgumentById(rsc,"tolist");
                 ArgumentData bodycontents = XMLBeansUtils.getArgumentById(rsc,"bodycontents");
@@ -67,6 +70,19 @@ public class PersonnelNotificationLauncher implements LauncherI {
 	                }
                 	br.close();
                 	fr.close(); 
+                }else {
+                	if (toArgs.size() == 1) { //Check if there are others to be notified
+                		String s = toArgs.get(0).getValue();
+                		String ids[] = s.split(",");
+                        for (String id : ids) {
+	                		ArgumentData toId = ArgumentData.Factory.newInstance();
+                            toId.setName("to");
+                            toId.setValue(id);
+                            toSplitArgs.add(toId);
+	                	}
+                	}else {
+                		toSplitArgs.addAll(toArgs);
+                	}
                 }
 
                 ArgumentData usernameArg = XMLBeansUtils.getArgumentById(rsc,"user");
@@ -86,13 +102,26 @@ public class PersonnelNotificationLauncher implements LauncherI {
                 String from = fromArg.getValue();
 
                 List<String> tos = new ArrayList<String>();
-                for (Object toArg : toArgs) {
+                for (Object toArg : toSplitArgs) {
                     tos.add(((ArgumentData) toArg).getValue());
                 }
 
                 List<String> ccs = new ArrayList<String>();
                 if (ccArgs != null) {
-                    for (Object ccArg : ccArgs) {
+                	if (ccArgs.size() == 1) { //Check if there are others to be notified
+                		String s = ccArgs.get(0).getValue();
+                		String ids[] = s.split(",");
+                        for (String id : ids) {
+	                		ArgumentData ccId = ArgumentData.Factory.newInstance();
+                            ccId.setName("cc");
+                            ccId.setValue(id);
+                            ccSplitArgs.add(ccId);
+	                	}
+                	}else {
+                		ccSplitArgs.addAll(ccArgs);
+                	}
+
+                	for (Object ccArg : ccSplitArgs) {
                         ccs.add(((ArgumentData) ccArg).getValue());
                     }
                 }
