@@ -6,3 +6,4 @@ syntax: regexp
 ^\.project$
 ^\.classpath$
 ^\.settings$
+^.*\.[ei]ml$

@@ -163,7 +163,7 @@ public class PersonnelNotificationLauncher implements LauncherI {
                 html = "<html>" + html + "</html>";
       
                 Map<String, File> attachments = new HashMap<String, File>();
-    
+
                 if (attachArgs != null && attachArgs.size() > 0) {
                     for (Object attachArg : attachArgs) {
                         String path = ((ArgumentData) attachArg).getValue();
