@@ -144,6 +144,17 @@ public class MailUtils {
     	return _service;
     }
 
+    public static void setMailService(String host) {
+        if (_service == null && host != null && !host.equals("")) {
+            try {
+                _service = new RestBasedMailServiceImpl(host + "data/services/mail/send");
+            } catch (NrgServiceException e) {
+                // probably an invalid server address
+                _log.error(e.getMessage());
+            }
+        }
+    }
+
     private static final Log _log = LogFactory.getLog(MailUtils.class);
     private static MailService _service;
 }
