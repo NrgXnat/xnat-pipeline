@@ -275,17 +275,4 @@
         </repository>
     </repositories>
 
-    <pluginRepositories>
-        <pluginRepository>
-            <id>org.nrg.maven.plugins.snapshot</id>
-            <name>XNAT Snapshot Maven Plugin Repo</name>
-            <url>http://maven.xnat.org/plugins-snapshot</url>
-        </pluginRepository>
-        <pluginRepository>
-            <id>org.nrg.maven.plugins.release</id>
-            <name>XNAT Release Maven Plugin Repo</name>
-            <url>http://maven.xnat.org/plugins-release</url>
-        </pluginRepository>
-    </pluginRepositories>
-
 </project>
