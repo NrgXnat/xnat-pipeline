@@ -1,11 +1,9 @@
 /* 
- *	Copyright Washington University in St Louis 2006
- *	All rights reserved
+ *	Copyright 2016, Washington University School of Medicine.
+ *	All rights reserved.
  * 	
- * 	@author Mohana Ramaratnam (Email: mramarat@wustl.edu)
-
-*/
-
+ * 	@author Mohana Ramaratnam
+ */
 package org.nrg.pipeline.utils;
 
 import java.io.ByteArrayOutputStream;
@@ -14,31 +12,26 @@ import java.util.StringTokenizer;
 import java.util.Vector;
 
 public class ExceptionUtils {
-    public static final Object getStackTrace(Exception e, String rtnType) {
-        ByteArrayOutputStream byteStream = null;
-        PrintWriter printWriter = null;
-        String stackTrace = null;
-        Vector stackArray = new Vector();
-    
-        byteStream = new ByteArrayOutputStream();
-        printWriter = new PrintWriter(byteStream, true);
-    
-        e.printStackTrace(printWriter);
-    
-        printWriter.flush();
-    
-        stackTrace = byteStream.toString();
-    
-        printWriter.close();
-    
+    public static Object getStackTrace(final Throwable e, final String rtnType) {
+        final ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
+
+        try (final PrintWriter printWriter = new PrintWriter(byteStream, true)) {
+            e.printStackTrace(printWriter);
+            printWriter.flush();
+        }
+
+        final String stackTrace = byteStream.toString();
+
+        final Vector<String> stackArray = new Vector<>();
         if (rtnType != null && rtnType.equalsIgnoreCase("vector")) {
-            StringTokenizer tok = new StringTokenizer(stackTrace,"\n");
-            while(tok.hasMoreTokens()){
-                String s = tok.nextToken();
-                stackArray.add(s);
+            final StringTokenizer tokenizer = new StringTokenizer(stackTrace, "\n");
+            while (tokenizer.hasMoreTokens()) {
+                final String token = tokenizer.nextToken();
+                stackArray.add(token);
             }
-            return(stackArray);
-        }else 
+            return (stackArray);
+        } else {
             return stackTrace;
+        }
     }
 }
