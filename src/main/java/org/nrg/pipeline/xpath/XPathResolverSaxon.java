@@ -20,7 +20,7 @@ import net.sf.saxon.om.Item;
 import net.sf.saxon.om.SequenceIterator;
 import net.sf.saxon.sxpath.XPathEvaluator;
 import net.sf.saxon.sxpath.XPathExpression;
-import net.sf.saxon.trans.IndependentContext;
+import net.sf.saxon.sxpath.IndependentContext;
 import net.sf.saxon.trans.XPathException;
 
 import org.apache.commons.lang.StringUtils;
