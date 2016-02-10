@@ -4,7 +4,7 @@
 
     <parent>
         <groupId>org.nrg</groupId>
-        <artifactId>nrg</artifactId>
+        <artifactId>parent</artifactId>
         <version>1.7.0-SNAPSHOT</version>
     </parent>
 
@@ -80,7 +80,7 @@
         </dependency>
         <dependency>
             <groupId>javax.mail</groupId>
-            <artifactId>mail</artifactId>
+            <artifactId>javax.mail-api</artifactId>
         </dependency>
 
         <!-- Test dependencies -->
@@ -92,24 +92,14 @@
 
         <!-- Upgradable libraries -->
         <dependency>
-            <!-- Upgrade to 9.1.0.8 -->
-            <groupId>net.sf.saxon</groupId>
-            <artifactId>saxon-dom</artifactId>
-            <version>8.7</version>
+            <groupId>net.sourceforge.saxon</groupId>
+            <artifactId>saxon</artifactId>
         </dependency>
         <dependency>
-            <!-- Upgrade to 9.1.0.8 -->
-            <groupId>net.sf.saxon</groupId>
-            <artifactId>saxon-xpath</artifactId>
-            <version>8.7</version>
-        </dependency>
-        <dependency>
-            <!-- TODO: Upgrade to 1.6.5 or 1.8.2. -->
-            <groupId>ant</groupId>
+            <groupId>org.apache.ant</groupId>
             <artifactId>ant</artifactId>
         </dependency>
         <dependency>
-            <!-- TODO: Upgrade to 1.4 or new package or use Spring. -->
             <groupId>axis</groupId>
             <artifactId>axis</artifactId>
             <exclusions>
@@ -124,44 +114,13 @@
             </exclusions>
         </dependency>
         <dependency>
-            <!-- TODO: Upgrade to 0.1.44-1 -->
             <groupId>com.jcraft</groupId>
             <artifactId>jsch</artifactId>
             <version>0.1.24</version>
         </dependency>
         <dependency>
-            <!-- TODO: Upgrade to 1.2 -->
-            <groupId>xml-resolver</groupId>
-            <artifactId>xml-resolver</artifactId>
-            <version>1.1</version>
-        </dependency>
-        <dependency>
-            <!-- TODO: Upgrade to 1.4 -->
-            <groupId>axis</groupId>
-            <artifactId>axis-saaj</artifactId>
-            <version>1.2</version>
-        </dependency>
-        <dependency>
-            <!-- TODO: Upgrade to 2.7.1 -->
-            <groupId>xalan</groupId>
-            <artifactId>xalan</artifactId>
-            <version>2.5.1</version>
-        </dependency>
-        <dependency>
-            <!-- TODO: Upgrade to 2.3.0 -->
             <groupId>org.apache.xmlbeans</groupId>
             <artifactId>xmlbeans-xpath</artifactId>
-        </dependency>
-        <dependency>
-            <!-- TODO: Upgrade to 2.9.1 -->
-            <groupId>xerces</groupId>
-            <artifactId>xercesImpl</artifactId>
-            <version>2.4.0</version>
-        </dependency>
-        <dependency>
-            <!-- TODO: Upgrade to 2.4.0 -->
-            <groupId>org.apache.xmlbeans</groupId>
-            <artifactId>xmlbeans-xmlpublic</artifactId>
         </dependency>
         <dependency>
             <groupId>org.nfunk</groupId>

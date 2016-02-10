@@ -25,7 +25,7 @@ import net.sf.saxon.om.Item;
 import net.sf.saxon.om.SequenceIterator;
 import net.sf.saxon.sxpath.XPathEvaluator;
 import net.sf.saxon.sxpath.XPathExpression;
-import net.sf.saxon.trans.IndependentContext;
+import net.sf.saxon.sxpath.IndependentContext;
 import net.sf.saxon.trans.XPathException;
 
 import org.apache.log4j.Logger;
@@ -98,8 +98,9 @@ public class ResourceUtils {
   
     
     public static boolean addArgumentToInternalResource(ResolvedResource internalResourceData, Argument argument, String value) {
-        boolean success = true;
-        if (internalResourceData == null) return !success;
+        if (internalResourceData == null) {
+            return false;
+        }
         Input internalResourceDataInput = internalResourceData.getInput(); 
         if (internalResourceDataInput == null) {
            internalResourceDataInput =  internalResourceData.addNewInput();
@@ -114,7 +115,7 @@ public class ResourceUtils {
         if (argument.isSetNospace())internalArgument.setNospace(argument.getNospace());
         if (argument.isSetPrefix())internalArgument.setPrefix(argument.getPrefix());
         internalArgument.setId(argument.getId());
-        return success;
+        return true;
     }
     
     
@@ -148,8 +149,7 @@ public class ResourceUtils {
         LinkedHashMap argumentsWithResolvedValues = resolvePipelineValues(pipelineDoc, rStep,internalSeedResourceData,originalRscData, argumentsWhichHavePipelineLoopOn);
         //LoggerUtils.print(argumentsWhichHavePipelineLoopOn);
         createResourcesForArguments(rStep,internalSeedResourceData,originalRscData, argumentsWithResolvedValues, stepResource, originalStep);
-        argumentsWithResolvedValues .clear();
-        argumentsWithResolvedValues  = null;
+        argumentsWithResolvedValues.clear();
     }
 
     private static LinkedHashMap resolvePipelineValues(PipelineDocument pipelineDoc, ResolvedStep rStep,  ResolvedResource internalSeedResourceData, ResourceData originalRscData, Hashtable argumentsWhichHavePipelineLoopOn) throws PipelineEngineException, TransformerException{
