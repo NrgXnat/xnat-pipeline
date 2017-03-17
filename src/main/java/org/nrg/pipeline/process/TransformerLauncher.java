@@ -12,12 +12,19 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.Hashtable;
+import java.util.Set;
 
 import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerConfigurationException;
+import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
@@ -51,8 +58,7 @@ import org.nrg.pipeline.xmlbeans.ResolvedStepDocument.ResolvedStep.ResolvedResou
 
 public class TransformerLauncher implements LauncherI  {
 	
-    public int launchProcess(ParameterData[] parameters, ResolvedStep rStep, CommandStatementPresenter command,
-            ResolvedResource rsc) throws PipelineEngineException {
+    public int launchProcess(final ParameterData[] parameters, final ResolvedStep rStep, final CommandStatementPresenter command, final ResolvedResource rsc) throws PipelineEngineException {
         notification = new Notification();
         if (!rsc.getType().equals(ResourceData.Type.TRANSFORMER)) {
             logger.debug("Recd a non-transformer resource type");
@@ -61,17 +67,35 @@ public class TransformerLauncher implements LauncherI  {
         try {
             if (!debug) {
             	
-            	ArgumentData xsltScriptPath = XMLBeansUtils.getArgumentById(rsc,"script");
-            	ArgumentData outFilePath = XMLBeansUtils.getArgumentById(rsc,"outfile");
-            	ArgumentData skipParameters = XMLBeansUtils.getArgumentById(rsc,"skip");
+            	final ArgumentData xsltScriptPath = XMLBeansUtils.getArgumentById(rsc,"script");
+            	final ArgumentData outFilePath = XMLBeansUtils.getArgumentById(rsc,"outfile");
+            	final ArgumentData skipParameters = XMLBeansUtils.getArgumentById(rsc,"skip");
 
             	if (xsltScriptPath == null) {
             		//Default tcsh parameters file which can be sourced by other processes.
             		XmlParamsToCshParams converter = new XmlParamsToCshParams(new String[]{outFilePath.getValue()});
             		converter.convert(parameters, skipParameters);
-            	}else {
-            		//TODO fill in this with appropriate call to the XSLT Transformer
-                    transform(parameters, skipParameters,xsltScriptPath,outFilePath);
+            	} else {
+            	    // Only write out the parameters that are not "skipped"
+                    final Set<String> paramsToSkip =
+                            (skipParameters != null && skipParameters.getValue() != null && skipParameters.getValue().contains(",")) ?
+                                    new HashSet<>(Arrays.asList(skipParameters.getValue().split(","))) :
+                                    null;
+                    final ParameterData[] parametersToTransform;
+                    if (paramsToSkip != null) {
+                        final Set<ParameterData> notSkippedParams = new HashSet<>();
+                        for (final ParameterData parameter : parameters) {
+                            if (paramsToSkip.contains(parameter.getName())) {
+                                continue;
+                            }
+                            notSkippedParams.add(parameter);
+                        }
+                        parametersToTransform = notSkippedParams.toArray(new ParameterData[notSkippedParams.size()]);
+                    } else {
+                        parametersToTransform = parameters;
+                    }
+
+                    transform(parametersToTransform, xsltScriptPath.getValue(), outFilePath.getValue());
             	}
 
             	if (outputFileName != null) {
@@ -87,19 +111,21 @@ public class TransformerLauncher implements LauncherI  {
             }
             notification.setStepTimeLaunched(AdminUtils.getTimeLaunched());
             return 0;
-        }catch(Exception e) {
+        } catch (Exception e) {
             try {
                 if (errorFileName != null) {
                     BufferedWriter out = new BufferedWriter(new FileWriter(errorFileName, true));
                     out.write("\n--------------------------------------------\n");
                     DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
                     out.write( dateFormat.format(Calendar.getInstance().getTime()) + "\n");
-                    out.write("Couldnt transform parameters. Exception:: " + e.getLocalizedMessage() );
+                    out.write("Could not transform parameters. Exception:: " + e.getLocalizedMessage() );
                     out.write("\n--------------------------------------------\n");
                     out.close();
                 }
-            }catch(Exception e1){}
-            throw new PipelineEngineException("Parameters couldnt be transformed " + e.getClass() + e.getLocalizedMessage(),e);
+            } catch (IOException ignored) {
+                // ignored
+            }
+            throw new PipelineEngineException("Parameters could not be transformed " + e.getClass() + e.getLocalizedMessage(),e);
         }
         
     }
@@ -108,54 +134,33 @@ public class TransformerLauncher implements LauncherI  {
     public void setErrorFileName(String errorFileName) {
         this.errorFileName = errorFileName;
     }
-    
-    private void transform(ParameterData[] parameters, ArgumentData skipParametersArg,ArgumentData xsltScriptPath,ArgumentData outFilePath) throws Exception {
-    
-    	 try {
-    		 Hashtable skipParams = new Hashtable();
-    		 ParameterData[] skippedParams = null;
-    		 if (skipParametersArg != null) {
-    			 String[] skipParameters = skipParametersArg.getValue().split(",");
-    			 for (int i = 0; i < skipParameters.length; i++) {
-    				 skipParams.put(skipParameters[i],"");
-    			 }
-    			 skippedParams = new ParameterData[parameters.length - skipParameters.length];
-    			 int j=0;
-    			 for (int i=0; i< parameters.length;i++) {
-    				 if (skipParams.containsKey(parameters[i].getName())) continue;
-    				 skippedParams[j] = parameters[i];
-    				 j++;
-    			 }
-    		 }else 
-    			 skippedParams = parameters;
 
- 		 
-             File stylesheet = new File(xsltScriptPath.getValue());
-             ParametersDocument parametersDoc = ParametersDocument.Factory.newInstance();
-             Parameters params = parametersDoc.addNewParameters();
-             params.setParameterArray(skippedParams);
-             ByteArrayOutputStream out = new ByteArrayOutputStream();
-             parametersDoc.save(out);
-             
-             StreamSource xmlSource = new StreamSource( new ByteArrayInputStream(out.toByteArray()));
-             
-             // Use a Transformer for output
-             TransformerFactory tFactory = TransformerFactory.newInstance();
-             StreamSource stylesource = new StreamSource(stylesheet);
-             Transformer transformer = tFactory.newTransformer(stylesource);
-             
-             
-             String streamResult = FileUtils.filenameToURL(outFilePath.getValue());
-             System.out.println("Transformer streaming result to " + streamResult);
-             StreamResult result = new StreamResult(streamResult);
-             
-             transformer.transform(xmlSource, result);
-         } catch (Exception e) {
-        	 e.printStackTrace();
-        	 throw e;
-         }
+    private void transform(final ParameterData[] parameters, final String xsltScriptPath, final String outFilePath) throws IOException, TransformerException {
+        // Create the parameters XML and get it into a stream
+        final ParametersDocument parametersDoc = ParametersDocument.Factory.newInstance();
+        final Parameters params = parametersDoc.addNewParameters();
+        params.setParameterArray(parameters);
+
+        final ByteArrayOutputStream parameterDocOutputStream = new ByteArrayOutputStream();
+        parametersDoc.save(parameterDocOutputStream);
+
+        final StreamSource parameterDocXmlStream = new StreamSource( new ByteArrayInputStream(parameterDocOutputStream.toByteArray()));
+
+        // Get the style sheet XML into a stream
+        final File stylesheet = new File(xsltScriptPath);
+        final StreamSource stylesheetStream = new StreamSource(stylesheet);
+
+        // Use a Transformer for output
+        final TransformerFactory tFactory = TransformerFactory.newInstance();
+        final Transformer transformer = tFactory.newTransformer(stylesheetStream);
+
+        final String outputFilePathUrl = FileUtils.filenameToURL(outFilePath);
+        System.out.println("Transformer streaming result to " + outputFilePathUrl);
+        final StreamResult outputFileStreamResult = new StreamResult(outputFilePathUrl);
+
+        transformer.transform(parameterDocXmlStream, outputFileStreamResult);
     }
-    
+
     
     public void setOutputFileName(String outputFileName) {
         this.outputFileName = outputFileName;
