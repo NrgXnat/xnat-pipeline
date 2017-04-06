@@ -13,9 +13,9 @@
 
     <name>XNAT Pipeline</name>
 
-    <url>https://bitbucket.org/nrg/xnat_pipeline/</url>
+    <url>https://github.com/nrgxnat/xnat-pipeline</url>
     <scm>
-        <url>https://bitbucket.org/nrg/xnat_pipeline</url>
+        <url>https://github.com/nrgxnat/xnat-pipeline</url>
     </scm>
 
     <organization>
