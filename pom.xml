@@ -9,7 +9,7 @@
     </parent>
 
     <groupId>org.nrg.xnat.pipeline</groupId>
-    <artifactId>xnat_pipeline</artifactId>
+    <artifactId>xnat-pipeline</artifactId>
 
     <name>XNAT Pipeline</name>
 
@@ -37,7 +37,7 @@
 
         <dependency>
             <groupId>org.nrg.xnat.pipeline</groupId>
-            <artifactId>xnat_tools</artifactId>
+            <artifactId>xnat-tools</artifactId>
         </dependency>
         <dependency>
             <groupId>org.nrg</groupId>
