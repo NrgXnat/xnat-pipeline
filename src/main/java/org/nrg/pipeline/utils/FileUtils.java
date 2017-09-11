@@ -47,16 +47,10 @@ public class FileUtils {
 
 	private static void maskSensitiveArguments(AllResolvedStepsDocument allResolvedStepsDocument) {
 		if (allResolvedStepsDocument != null) {
-			ResolvedStep[] resolvedSteps = allResolvedStepsDocument.getAllResolvedSteps().getResolvedStepArray();
-			for (int i =0; i < resolvedSteps.length; i++) {
-				ResolvedStep step = resolvedSteps[i];
-				ResolvedResource[] rscs = step.getResolvedResourceArray();
-				for (int j=0; j< rscs.length; j++) {
-					ResolvedResource rsc = rscs[j];
+			for (final ResolvedStep step : allResolvedStepsDocument.getAllResolvedSteps().getResolvedStepArray()) {
+				for (final ResolvedResource rsc : step.getResolvedResourceArray()) {
 					if (rsc.isSetInput()) {
-						Argument[] args = rsc.getInput().getArgumentArray();
-						for (int k=0; k< args.length; k++) {
-							Argument arg = args[k];
+						for (final Argument arg : rsc.getInput().getArgumentArray()) {
 							if (arg.isSetIsSensitive() && arg.isSetValue()) {
 								arg.setValue("******");
 							}
@@ -70,6 +64,7 @@ public class FileUtils {
     public static void saveFile(File file, AllResolvedStepsDocument allResolvedStepsDocument) throws IOException {
         if (allResolvedStepsDocument != null) {
             ParameterUtils.maskPwdParameter(allResolvedStepsDocument);
+            maskSensitiveArguments(allResolvedStepsDocument);
 
             String savedFile = file.getAbsolutePath();
             try {
