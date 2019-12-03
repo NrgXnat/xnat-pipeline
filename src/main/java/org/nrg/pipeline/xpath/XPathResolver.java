@@ -17,8 +17,8 @@ import javax.xml.transform.TransformerException;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.apache.xpath.XPathAPI;
-import org.apache.xpath.objects.XObject;
+import com.sun.org.apache.xpath.internal.XPathAPI;
+import com.sun.org.apache.xpath.internal.objects.XObject;
 import org.nrg.pipeline.constants.PipelineConstants;
 import org.nrg.pipeline.exception.PipelineEngineException;
 import org.nrg.pipeline.utils.LoopUtils;
