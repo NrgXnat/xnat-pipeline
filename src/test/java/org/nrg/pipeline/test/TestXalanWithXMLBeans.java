@@ -17,7 +17,7 @@ import javax.xml.transform.TransformerException;
 import org.apache.log4j.BasicConfigurator;
 import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlObject;
-import org.apache.xpath.XPathAPI;
+import com.sun.org.apache.xpath.internal.XPathAPI;
 import org.nrg.pipeline.exception.PipelineEngineException;
 import org.nrg.pipeline.utils.XMLBeansUtils;
 import org.nrg.pipeline.xmlbeans.PipelineDocument;
