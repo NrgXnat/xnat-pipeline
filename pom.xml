@@ -20,7 +20,7 @@
 
     <organization>
         <name>Neuroinformatics Research Group</name>
-        <url>http://nrg.wustl.edu</url>
+        <url>https://nrg.wustl.edu</url>
     </organization>
 
     <dependencies>
@@ -173,12 +173,12 @@
         <repository>
             <id>org.nrg.maven.artifacts.snapshot</id>
             <name>XNAT Snapshot Maven Repo</name>
-            <url>http://nrgxnat.artifactoryonline.com/nrgxnat/libs-snapshot</url>
+            <url>https://nrgxnat.jfrog.io/nrgxnat/libs-snapshot</url>
         </repository>
         <repository>
             <id>org.nrg.maven.artifacts.release</id>
             <name>XNAT Release Maven Repo</name>
-            <url>http://nrgxnat.artifactoryonline.com/nrgxnat/libs-release</url>
+            <url>https://nrgxnat.jfrog.io/nrgxnat/libs-release</url>
         </repository>
     </repositories>
 
